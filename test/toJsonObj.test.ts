@@ -217,6 +217,32 @@ describe('toJsonObj', function() {
     })
   })
 
+  it('should use toJson method if available', function() {
+    let test = {
+      a: 'a',
+      toJson: () => { return { a: 'aa' } }
+    }
+
+    let obj = toJsonObj(test)
+    
+    expect(obj).to.deep.equal({
+      a: 'aa'
+    })
+  })
+
+  it('should use toJsonObj method if available', function() {
+    let test = {
+      a: 'a',
+      toJsonObj: () => { return { a: 'aa' } }
+    }
+
+    let obj = toJsonObj(test)
+    
+    expect(obj).to.deep.equal({
+      a: 'aa'
+    })
+  })
+
   it('should not use toObj method if coresponding option is set', function() {
     let test = {
       a: 'a',

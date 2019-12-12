@@ -24,9 +24,19 @@ export function toJsonObj(obj: any, options?: ToJsonOptions): any {
     return jsonArray
   }
 
-  if ((! options || options && ! options.doNotUseConversionMethodOnObject) && obj !== null && typeof obj.toObj === 'function') {
-    return obj.toObj()
-  }
+  if ((! options || options && ! options.doNotUseConversionMethodOnObject) && obj !== null) {
+    if (typeof obj.toObj === 'function') {
+      return obj.toObj()
+    }
+
+    if (typeof obj.toJson === 'function') {
+      return obj.toJson()
+    }
+
+    if (typeof obj.toJsonObj === 'function') {
+      return obj.toJsonObj()
+    }
+  } 
 
   let jsonObj: any = {}
 
@@ -119,6 +129,10 @@ export interface FillWithJsonObjOptions {
 }
 
 export function fillWithJsonObj(obj: any, fillWith: any, options?: FillWithJsonObjOptions) {
+  if (typeof obj !== 'object' || obj === null) {
+    return 
+  }
+
   if (typeof fillWith === 'string') {
     try {
       let parsed = JSON.parse(fillWith)
@@ -135,29 +149,40 @@ export function fillWithJsonObj(obj: any, fillWith: any, options?: FillWithJsonO
     return 
   }
 
-  for (let prop in fillWith) {
-    if (! Object.prototype.hasOwnProperty.call(fillWith, prop)) {
-      continue
-    }
-
-    if (prop == '@class') {
-      continue
-    }
-
-    let propName = prop.toString()
-    let propValue = fillWith[propName]
-
-    if (propValue instanceof Array) {
-      obj[propName] = fromJsonObj(propValue, options ? options.instantiator : undefined)
-    }
-
-    else if (typeof propValue === 'object') {
-      obj[propName] = fromJsonObj(propValue, options ? options.instantiator : undefined)
-    }
-    
-    else {
-      obj[propName] = propValue
-    }
+  if (typeof obj.fillWithObj === 'function') {
+    obj.fillWithObj(fillWith)
+  }
+  else if (typeof obj.fillWithJson === 'function') {
+    obj.fillWithJson(fillWith)
+  }
+  else if (typeof obj.fillWithJsonObj === 'function') {
+    obj.fillWithJsonObj(fillWith)
+  }
+  else {
+    for (let prop in fillWith) {
+      if (! Object.prototype.hasOwnProperty.call(fillWith, prop)) {
+        continue
+      }
+  
+      if (prop == '@class') {
+        continue
+      }
+  
+      let propName = prop.toString()
+      let propValue = fillWith[propName]
+  
+      if (propValue instanceof Array) {
+        obj[propName] = fromJsonObj(propValue, options ? options.instantiator : undefined)
+      }
+  
+      else if (typeof propValue === 'object') {
+        obj[propName] = fromJsonObj(propValue, options ? options.instantiator : undefined)
+      }
+      
+      else {
+        obj[propName] = propValue
+      }
+    }  
   }
 }
 
@@ -205,6 +230,12 @@ export function fromJsonObj(jsonObj: any, instantiator?: Instantiator): any {
 
   if (typeof obj.fillWithObj === 'function') {
     obj.fillWithObj(jsonObj)
+  }
+  else if (typeof obj.fillWithJson === 'function') {
+    obj.fillWithJson(jsonObj)
+  }
+  else if (typeof obj.fillWithJsonObj === 'function') {
+    obj.fillWithJsonObj(jsonObj)
   }
   else {
     fillWithJsonObj(obj, jsonObj, { instantiator: instantiator })
