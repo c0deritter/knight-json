@@ -47,7 +47,7 @@ describe('fromJsonObj', function() {
     expect(obj).to.be.instanceOf(Object)
     expect(obj.b).to.be.instanceOf(Array)
     expect(obj.b.length).to.equal(1)
-    expect(obj.b[1]).to.be.instanceOf(Object)
+    expect(obj.b[0]).to.be.instanceOf(Object)
   })
 })
 
