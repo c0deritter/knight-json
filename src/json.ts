@@ -135,10 +135,6 @@ export function fillWithJsonObj(obj: any, fillWith: any, options?: FillWithJsonO
     return 
   }
 
-  if (fillWith instanceof Array) {
-
-  }
-
   for (let prop in fillWith) {
     if (! Object.prototype.hasOwnProperty.call(fillWith, prop)) {
       continue
@@ -152,7 +148,7 @@ export function fillWithJsonObj(obj: any, fillWith: any, options?: FillWithJsonO
     let propValue = fillWith[propName]
 
     if (propValue instanceof Array) {
-      obj[propName] = fromJsonObj(propValue)
+      obj[propName] = fromJsonObj(propValue, options ? options.instantiator : undefined)
     }
 
     else if (typeof propValue === 'object') {
