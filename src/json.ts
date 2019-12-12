@@ -144,6 +144,10 @@ export function fillWithJsonObj(obj: any, fillWith: any, options?: FillWithJsonO
       continue
     }
 
+    if (prop == '@class') {
+      continue
+    }
+
     let propName = prop.toString()
     let propValue = fillWith[propName]
 
@@ -188,12 +192,15 @@ export function fromJsonObj(jsonObj: any, instantiator?: Instantiator): any {
 
   let obj
 
-  if ('@class' in jsonObj && typeof jsonObj['@class'] === 'string' && instantiator) {
+  if ('@class' in jsonObj && typeof jsonObj['@class'] === 'string' && instantiator != undefined) {
     let cls: string = jsonObj['@class']
 
     if (cls in instantiator) {
       let instantiatorFunction = instantiator[cls]
       obj = instantiatorFunction()
+    }
+    else {
+      obj = {}
     }
   }
   else {

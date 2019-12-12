@@ -1,6 +1,6 @@
 {
   "name": "mega-nice-json",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "A mega nice JSON converter",
   "main": "lib/json.js",
   "types": "lib/json.d.ts",
