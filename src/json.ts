@@ -12,7 +12,23 @@ export function toJsonObj(obj: any, options?: ToJsonOptions): any {
     return obj
   }
 
-  let jsonObj: any
+  if (obj instanceof Array) {
+    let jsonArray = []
+
+    for (let element of obj) {
+      let jsonObj = toJsonObj(element, options)
+      jsonArray.push(jsonObj)
+    }
+
+    return jsonArray
+  }
+
+  let jsonObj: any = {}
+
+  // add class information
+  if ((! options || options && ! options.omitClassProperty) && obj.constructor.name != 'Object') {
+    jsonObj['@class'] = obj.constructor.name
+  }
 
   // copy any field that is not private and not the parent
   for (let prop in obj) {
@@ -46,27 +62,24 @@ export function toJsonObj(obj: any, options?: ToJsonOptions): any {
       continue
     }
 
-    // if the value is undefined skip it. We do not want to have it in the object.
-    if (propValue == undefined) {
+    // if the value is undefined skip it
+    if (propValue === undefined) {
       continue
     }
 
     // skip empty arrays if we do not keep empty arrays
-    if (options && ! options.keepEmptyArrays && propValue instanceof Array && ! propValue) {
+    if ((! options || options && ! options.keepEmptyArrays) 
+        && propValue instanceof Array && propValue.length == 0) {
       continue
     }
 
     // skip empty objects if we do not keep empty objects
-    if (options && ! options.keepEmptyObjects && typeof propValue === 'object' && ! propValue) {
+    if ((! options || options && ! options.keepEmptyObjects) 
+        && typeof propValue === 'object' && propValue !== null && Object.keys(propValue).length == 0) {
       continue
     }
 
     // start conversion
-
-    // add class information
-    if (! options || options && ! options.omitClassProperty) {
-      jsonObj['@class'] = obj.constructor.name
-    }
 
     // if there is a custom converter for the property
     if (options && options.converter && propName in options.converter) {
@@ -74,25 +87,20 @@ export function toJsonObj(obj: any, options?: ToJsonOptions): any {
       jsonObj[propName] = converter(propValue)
     }
 
-    // if the value is an object it may have the 'toObj' method
-    else if (typeof propValue.toObj === 'function') {
-      jsonObj[propName] = propValue.toObj()
-    }
-
     // else if it is an array we need to iterate every single array item
     else if (propValue instanceof Array) {
-      let jsonArray = []
-
-      for (let arrayValue of propValue) {
-        if (typeof arrayValue.toObj === 'function') {
-          jsonArray.push(arrayValue.toObj())
-        }
-        else {
-          jsonArray.push(arrayValue)
-        }
-      }
-
+      let jsonArray = toJsonObj(propValue, options)
       jsonObj[propName] = jsonArray
+    }
+
+    // if the value is an object it may have the 'toObj' method
+    else if (typeof propValue == 'object' && propValue !== null) {
+      if (propValue !== null && typeof propValue.toObj === 'function') {
+        jsonObj[propName] = propValue.toObj()
+      }
+      else {
+        jsonObj[propName] = toJsonObj(propValue, options)
+      }
     }
 
     // otherwise just set it
@@ -117,13 +125,18 @@ export function fillWithJsonObj(obj: any, fillWith: any, options?: FillWithJsonO
       fillWithJsonObj(obj, parsed)
     }
     catch (e) {
-      throw new Error('Could not parse given JSON string')
+      // if it is not a JSON string we can do nothing
+      return
     }
   }
 
   // if the given value to fill with is not an object just do nothing
   if (typeof fillWith !== 'object') {
     return 
+  }
+
+  if (fillWith instanceof Array) {
+
   }
 
   for (let prop in fillWith) {
@@ -134,25 +147,14 @@ export function fillWithJsonObj(obj: any, fillWith: any, options?: FillWithJsonO
     let propName = prop.toString()
     let propValue = fillWith[propName]
 
-    if (typeof propValue === 'object') {
+    if (propValue instanceof Array) {
+      obj[propName] = fromJsonObj(propValue)
+    }
+
+    else if (typeof propValue === 'object') {
       obj[propName] = fromJsonObj(propValue, options ? options.instantiator : undefined)
     }
     
-    else if (propValue instanceof Array) {
-      let values = []
-      
-      for (let value of propValue) {
-        if (typeof value === 'object') {
-          values.push(fromJsonObj(value))
-        }
-        else {
-          values.push(value)
-        }
-      }
-
-      obj[propName] = values
-    }
-
     else {
       obj[propName] = propValue
     }
@@ -166,12 +168,22 @@ export function fromJsonObj(jsonObj: any, instantiator?: Instantiator): any {
       fromJsonObj(parsed, instantiator)
     }
     catch (e) {
-      throw new Error('Could not parse given JSON string')
+      return jsonObj
     }
   }
 
   if (typeof jsonObj !== 'object') {
     return jsonObj
+  }
+
+  if (jsonObj instanceof Array) {
+    let values = []
+      
+    for (let value of jsonObj) {
+      values.push(fromJsonObj(value, instantiator))
+    }
+
+    return values
   }
 
   let obj
@@ -180,8 +192,8 @@ export function fromJsonObj(jsonObj: any, instantiator?: Instantiator): any {
     let cls: string = jsonObj['@class']
 
     if (cls in instantiator) {
-      let i = instantiator[cls]
-      obj = i()
+      let instantiatorFunction = instantiator[cls]
+      obj = instantiatorFunction()
     }
   }
   else {
@@ -194,6 +206,8 @@ export function fromJsonObj(jsonObj: any, instantiator?: Instantiator): any {
   else {
     fillWithJsonObj(obj, jsonObj, { instantiator: instantiator })
   }
+
+  return obj
 }
 
 export class Instantiator {

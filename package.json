@@ -1,6 +1,6 @@
 {
   "name": "mega-nice-json",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "A mega nice JSON converter",
   "main": "lib/json.js",
   "types": "lib/json.d.ts",
@@ -9,11 +9,16 @@
   ],
   "dependencies": {},
   "devDependencies": {
+    "@types/chai": "^4.2.7",
+    "@types/mocha": "^5.2.7",
+    "@types/node": "^12.12.17",
+    "chai": "^4.2.0",
+    "mocha": "^6.2.2",
     "ts-node": "^8.4.1",
     "typescript": "^3.7.2"
   },
   "scripts": {
-    "test": "mocha -r ts-node/register test/**/*.spec.ts",
+    "test": "mocha -r ts-node/register test/**/*.test.ts",
     "build": "rm -rf lib && tsc"
   },
   "repository": {
