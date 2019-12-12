@@ -5,6 +5,7 @@ export interface ToJsonOptions {
   keepEmptyArrays?: boolean
   keepEmptyObjects?: boolean
   omitClassProperty?: boolean
+  doNotUseConversionMethodOnObject?: boolean
 }
 
 export function toJsonObj(obj: any, options?: ToJsonOptions): any {
@@ -23,7 +24,7 @@ export function toJsonObj(obj: any, options?: ToJsonOptions): any {
     return jsonArray
   }
 
-  if (obj !== null && typeof obj.toObj === 'function') {
+  if ((! options || options && ! options.doNotUseConversionMethodOnObject) && obj !== null && typeof obj.toObj === 'function') {
     return obj.toObj()
   }
 
