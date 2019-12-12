@@ -202,6 +202,19 @@ describe('toJsonObj', function() {
       '@class': 'TestClass1',
       a: 'aa'
     })
+  })  
+
+  it('should use toObj method if available', function() {
+    let test = {
+      a: 'a',
+      toObj: () => { return { a: 'aa' } }
+    }
+
+    let obj = toJsonObj(test)
+    
+    expect(obj).to.deep.equal({
+      a: 'aa'
+    })
   })
 })
 

@@ -23,6 +23,10 @@ export function toJsonObj(obj: any, options?: ToJsonOptions): any {
     return jsonArray
   }
 
+  if (obj !== null && typeof obj.toObj === 'function') {
+    return obj.toObj()
+  }
+
   let jsonObj: any = {}
 
   // add class information
@@ -95,12 +99,7 @@ export function toJsonObj(obj: any, options?: ToJsonOptions): any {
 
     // if the value is an object it may have the 'toObj' method
     else if (typeof propValue == 'object' && propValue !== null) {
-      if (propValue !== null && typeof propValue.toObj === 'function') {
-        jsonObj[propName] = propValue.toObj()
-      }
-      else {
-        jsonObj[propName] = toJsonObj(propValue, options)
-      }
+      jsonObj[propName] = toJsonObj(propValue, options)
     }
 
     // otherwise just set it
