@@ -197,7 +197,7 @@ export function fromJsonObj(jsonObj: any, instantiator?: Instantiator): any {
     }
   }
 
-  if (typeof jsonObj !== 'object') {
+  if (typeof jsonObj !== 'object' || jsonObj === null) {
     return jsonObj
   }
 

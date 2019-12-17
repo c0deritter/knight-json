@@ -82,6 +82,11 @@ describe('fromJsonObj', function() {
 
     expect(obj.a).to.equal('aa')
   })
+
+  it('should just return null if the given value was null', function() {
+    let obj = fromJsonObj(null)
+    expect(obj).to.be.null
+  })
 })
 
 class TestClass1 {}
