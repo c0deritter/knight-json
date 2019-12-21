@@ -1,6 +1,6 @@
-import 'mocha'
 import { expect } from 'chai'
-import { fromJsonObj, Instantiator, fillWithJsonObj } from '../src/json'
+import 'mocha'
+import { fromJsonObj, Instantiator } from '../src/json'
 
 describe('fromJsonObj', function() {
   it('should create an empty object', function() {
