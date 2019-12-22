@@ -244,13 +244,13 @@ export function fromJsonObj(jsonObj: any, instantiator?: Instantiator): any {
   }
 
   if (typeof obj.fillWithObj === 'function') {
-    obj.fillWithObj(jsonObj)
+    obj.fillWithObj(jsonObj, { instantiator: instantiator })
   }
   else if (typeof obj.fillWithJson === 'function') {
-    obj.fillWithJson(jsonObj)
+    obj.fillWithJson(jsonObj, { instantiator: instantiator })
   }
   else if (typeof obj.fillWithJsonObj === 'function') {
-    obj.fillWithJsonObj(jsonObj)
+    obj.fillWithJsonObj(jsonObj, { instantiator: instantiator })
   }
   else {
     fillWithJsonObj(obj, jsonObj, { instantiator: instantiator })
