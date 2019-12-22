@@ -26,15 +26,15 @@ export function toJsonObj(obj: any, options?: ToJsonOptions): any {
 
   if ((! options || options && ! options.doNotUseCustomToJsonMethodOfFirstObject) && obj !== null) {
     if (typeof obj.toObj === 'function') {
-      return obj.toObj()
+      return obj.toObj(options)
     }
 
     if (typeof obj.toJson === 'function') {
-      return obj.toJson()
+      return obj.toJson(options)
     }
 
     if (typeof obj.toJsonObj === 'function') {
-      return obj.toJsonObj()
+      return obj.toJsonObj(options)
     }
   }
 
@@ -156,15 +156,15 @@ export function fillWithJsonObj(obj: any, fillWith: any, options?: FillWithJsonO
 
   if (! options || options && ! options.doNotUseCustomToJsonMethodOfFirstObject) {
     if (typeof obj.fillWithObj === 'function') {
-      obj.fillWithObj(fillWith)
+      obj.fillWithObj(fillWith, options)
       return
     }
     else if (typeof obj.fillWithJson === 'function') {
-      obj.fillWithJson(fillWith)
+      obj.fillWithJson(fillWith, options)
       return
     }
     else if (typeof obj.fillWithJsonObj === 'function') {
-      obj.fillWithJsonObj(fillWith)
+      obj.fillWithJsonObj(fillWith, options)
       return
     }
   }
