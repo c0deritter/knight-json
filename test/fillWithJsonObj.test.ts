@@ -108,11 +108,84 @@ describe('fillWithJsonObj', function() {
     fillWithJsonObj(1, {})
     fillWithJsonObj(true, {})
   })
+
+  it('should fill a property of type object', function() {
+    let test = {
+      a: {
+        b: 'b',
+        c: 1
+      }
+    }
+
+    let fillWith = {
+      a: {
+        c: 2,
+        d: 'd'
+      }
+    }
+
+    fillWithJsonObj(test, fillWith)
+
+    expect(test).to.deep.equal({
+      a: {
+        b: 'b',
+        c: 2,
+        d: 'd'
+      }
+    })
+  })
+
+  it('should replace a property of type object with null', function(){
+    let test = {
+      a: {
+        b: 'b',
+        c: 1
+      }
+    }
+
+    let fillWith = {
+      a: null
+    }
+
+    fillWithJsonObj(test, fillWith)
+
+    expect(test).to.deep.equal({
+      a: null
+    })
+  })
+
+  it('should replace a property of type object with any primitive value', function() {
+    let test = {
+      a: {
+        b: 'b',
+        c: 1
+      }
+    }
+
+    let fillWith = {
+      a: 'a'
+    }
+
+    fillWithJsonObj(test, fillWith)
+
+    expect(test).to.deep.equal({
+      a: 'a'
+    })
+  })
+
+  it('should not use the custom fill method on the object if the corresponding option is set', function() {
+    let test = new TestClass1();
+    test.b = new TestClass1()
+    fillWithJsonObj(test, { a: 'a', b: { a: 'a' } }, { doNotUseCustomToJsonMethodOfFirstObject: true })
+    expect(test.a).to.equal('a')
+    expect(test.b.a).to.equal('aa')
+  })
 })
 
 class TestClass1 {
   a!: string
-  fillWithObj(jsonObj: any) { 
+  b!: any
+  fillWithObj(jsonObj: any) {console.log('TestClass1.fillWithObj', jsonObj)
     this.a = jsonObj.a + 'a'
   }
 }

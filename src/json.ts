@@ -38,7 +38,7 @@ export function toJsonObj(obj: any, options?: ToJsonOptions): any {
     }
   }
 
-  if (options && options.doNotUseCustomToJsonMethodOfFirstObject) {
+  if (options) {
     delete options.doNotUseCustomToJsonMethodOfFirstObject
   }
 
@@ -130,6 +130,7 @@ export interface FillWithJsonObjOptions {
   include?: string[]
   exclude?: string[]
   instantiator?: Instantiator
+  doNotUseCustomToJsonMethodOfFirstObject?: boolean
 }
 
 export function fillWithJsonObj(obj: any, fillWith: any, options?: FillWithJsonObjOptions) {
@@ -153,40 +154,50 @@ export function fillWithJsonObj(obj: any, fillWith: any, options?: FillWithJsonO
     return 
   }
 
-  if (typeof obj.fillWithObj === 'function') {
-    obj.fillWithObj(fillWith)
+  if (! options || options && ! options.doNotUseCustomToJsonMethodOfFirstObject) {
+    if (typeof obj.fillWithObj === 'function') {
+      obj.fillWithObj(fillWith)
+      return
+    }
+    else if (typeof obj.fillWithJson === 'function') {
+      obj.fillWithJson(fillWith)
+      return
+    }
+    else if (typeof obj.fillWithJsonObj === 'function') {
+      obj.fillWithJsonObj(fillWith)
+      return
+    }
   }
-  else if (typeof obj.fillWithJson === 'function') {
-    obj.fillWithJson(fillWith)
+
+  if (options) {
+    delete options.doNotUseCustomToJsonMethodOfFirstObject
   }
-  else if (typeof obj.fillWithJsonObj === 'function') {
-    obj.fillWithJsonObj(fillWith)
-  }
-  else {
-    for (let prop in fillWith) {
-      if (! Object.prototype.hasOwnProperty.call(fillWith, prop)) {
-        continue
+
+  for (let prop in fillWith) {
+    if (! Object.prototype.hasOwnProperty.call(fillWith, prop)) {
+      continue
+    }
+
+    if (prop == '@class') {
+      continue
+    }
+
+    let propName = prop.toString()
+    let originalValue = obj[propName]
+    let fillWithValue = fillWith[propName]
+
+    if (typeof originalValue === 'object' && originalValue !== null 
+        && typeof fillWithValue === 'object' && fillWithValue !== null) {
+      fillWithJsonObj(originalValue, fillWithValue, options)
+    }
+    else {
+      if (typeof fillWithValue === 'object') {
+        obj[propName] = fromJsonObj(fillWithValue, options ? options.instantiator : undefined)
       }
-  
-      if (prop == '@class') {
-        continue
-      }
-  
-      let propName = prop.toString()
-      let propValue = fillWith[propName]
-  
-      if (propValue instanceof Array) {
-        obj[propName] = fromJsonObj(propValue, options ? options.instantiator : undefined)
-      }
-  
-      else if (typeof propValue === 'object') {
-        obj[propName] = fromJsonObj(propValue, options ? options.instantiator : undefined)
-      }
-      
       else {
-        obj[propName] = propValue
-      }
-    }  
+        obj[propName] = fillWithValue
+      }  
+    }
   }
 }
 
