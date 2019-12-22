@@ -50,6 +50,41 @@ describe('fromJsonObj', function() {
     expect(obj.b[0]).to.be.instanceOf(Object)
   })
 
+  it('should create the corresponding class of objects inside an array', function() {
+    let array = [
+      { '@class': 'TestClass1' },
+      'a',
+      1,
+      { '@class': 'TestClass2' }
+    ]
+
+    let convertedArray = fromJsonObj(array, new TestInstantiator())
+
+    expect(convertedArray.length).to.equal(4)
+    expect(convertedArray[0]).to.be.instanceOf(TestClass1)
+    expect(convertedArray[1]).to.equal('a')
+    expect(convertedArray[2]).to.equal(1)
+    expect(convertedArray[3]).to.be.instanceOf(TestClass2)
+
+    let obj = {
+      a: 'a',
+      b: array,
+      c: 1
+    }
+
+    let convertedObj = fromJsonObj(obj, new TestInstantiator())
+    
+    expect(convertedObj).to.not.be.undefined
+    expect(convertedObj.a).to.equal('a')
+    expect(convertedObj.b).to.be.instanceOf(Array)
+    expect(convertedObj.b.length).to.equal(4)
+    expect(convertedObj.b[0]).to.be.instanceOf(TestClass1)
+    expect(convertedObj.b[1]).to.equal('a')
+    expect(convertedObj.b[2]).to.equal(1)
+    expect(convertedObj.b[3]).to.be.instanceOf(TestClass2)
+    expect(convertedObj.c).to.equal(1)
+  })
+
   it('should use fillWithObj method if available', function() {
     let jsonObj = { 
       '@class': 'TestClass3',
