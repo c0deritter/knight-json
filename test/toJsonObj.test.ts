@@ -243,15 +243,20 @@ describe('toJsonObj', function() {
     })
   })
 
-  it('should not use toObj method if coresponding option is set', function() {
+  it('should not use toObj method on first object if coresponding option is set', function() {
     let test = {
       a: 'a',
+      b: {
+        c: 1,
+        toObj: () => { return { c: 11 } }
+      },
       toObj: () => { return { a: 'aa' } }
     }
 
-    let obj = toJsonObj(test, { doNotUseConversionMethodOnObject: true })
+    let obj = toJsonObj(test, { doNotUseCustomToJsonMethodOfFirstObject: true })
     
     expect(obj.a).to.equal('a')
+    expect(obj.b.c).to.equal(11)
   })
 })
 
