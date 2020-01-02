@@ -174,7 +174,7 @@ describe('fillWithJsonObj', function() {
   })
 
   it('should not use the custom fill method on the object if the corresponding option is set', function() {
-    let test = new TestClass1();
+    let test = new TestClass1()
     test.b = new TestClass1()
     fillWithJsonObj(test, { a: 'a', b: { a: 'a' } }, { doNotUseCustomToJsonMethodOfFirstObject: true })
     expect(test.a).to.equal('a')
@@ -185,7 +185,7 @@ describe('fillWithJsonObj', function() {
 class TestClass1 {
   a!: string
   b!: any
-  fillWithObj(jsonObj: any) {console.log('TestClass1.fillWithObj', jsonObj)
+  fillWithObj(jsonObj: any) {
     this.a = jsonObj.a + 'a'
   }
 }
