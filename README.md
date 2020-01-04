@@ -4,7 +4,7 @@ A mega nice programming language object to JSON object converter.
 
 ## To JSON object
 
-Convert one of your classes to a plain JavaScript object which can be converted to a JSON string.
+Convert one of your classes to a plain JavaScript object called a JSON object which is ready to be converted to a JSON string.
 
 ```typescript
 class User {
@@ -13,7 +13,6 @@ class User {
 }
 
 var user = new User
-
 var userObj = toJsonObj(user)
 
 userObj == {
@@ -33,20 +32,15 @@ Take a JSON containing a JSON object created by this library. Combine it with an
 
 ```typescript
 var userJson = '{"@class":"User","id":1,"name":"Ronny"}'
-
 var userObj = JSON.parse(userJson)
-
-userObj == {
-  '@class': 'User',
-  id: 1,
-  name: 'Ronny'
-}
 
 var instantiator = {
   'User': () => new User()
 }
 
 var user = fromJsonObj(userObj, instantiator)
+
+user instanceof User == true
 
 user == {
   id: 1,
@@ -60,9 +54,7 @@ Fill that object that you already have in place.
 
 ```typescript
 var userJson = '{"@class":"User","id":2,"name":"Hagen"}'
-
 var userObj = JSON.parse(userJson)
-
 var user = new User
 
 fillWithJsonObj(user, userObj)
@@ -88,6 +80,7 @@ var user = new User
 var userObj = toJsonObj(user)
 
 userObj == {
+  '@class': 'User',
   id: 2,
   name: 'Hagen'
 }
@@ -110,6 +103,7 @@ var user = new User
 var userObj = toJsonObj(user)
 
 userObj == {
+  '@class': 'User',
   id: 2,
   name: 'Hagen',
   password: 'secret'
@@ -118,7 +112,7 @@ userObj == {
 
 ## Blacklist or whitelist properties
 
-You can specify properties to exlude.
+You can specify properties to exclude.
 
 ```typescript
 class User {
@@ -128,12 +122,7 @@ class User {
 }
 
 var user = new User
-
-var options = {
-  exclude: ['password']
-}
-
-var userObj = toJsonObj(user, options)
+var userObj = toJsonObj(user, { exclude: ['password'] })
 
 userObj == {
   id: 3,
@@ -151,12 +140,7 @@ class User {
 }
 
 var user = new User
-
-var options = {
-  include: ['id', 'name']
-}
-
-var userObj = toJsonObj(user, options)
+var userObj = toJsonObj(user, { include: ['id', 'name'] })
 
 userObj == {
   id: 3,
@@ -166,7 +150,7 @@ userObj == {
 
 ## Customize toJsonObj
 
-If you need to do something custom when converting one of your objects defined a `toJsonObj` method. Additionally there is also support to name this method `toJson` or `toObj`.
+If you need to do something custom when converting one of your objects define a `toJsonObj` method which will be used to convert your object. Additionally there is also support to name this method `toJson` or `toObj`.
 
 ```typescript
 class User {
@@ -239,12 +223,19 @@ You can combine instantiators by using the provided `Instantiator` class.
 import { Instantiator } from 'mega-nice-json'
 
 class UserInstantiator extends Instantiator {
-  'User' = () => new User()
+  'User' = () => new User
 }
 
 class AppInstantiator extends Instantiator {
-  'SomeClass' = () => new SomeClass()
+  'SomeClass' = () => new SomeClass
 
   constructor(new UserInstantiator) {}
+}
+
+var instantiator = new AppInstantiator
+
+instantiator == {
+  'SomeClass': () => new SomeClass
+  'User': () => new User
 }
 ```
