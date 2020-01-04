@@ -1,0 +1,250 @@
+# Quick start
+
+A mega nice programming language object to JSON object converter.
+
+## To JSON object
+
+Convert one of your classes to a plain JavaScript object which can be converted to a JSON string.
+
+```typescript
+class User {
+  id = 1
+  name = 'Ronny'
+}
+
+var user = new User
+
+var userObj = toJsonObj(user)
+
+userObj == {
+  '@class': 'User',
+  id: 1
+  name: 'Ronny'
+}
+
+var userJson = JSON.stringify(userObj)
+
+userJson == '{"@class":"User","id":1,"name":"Ronny"}'
+```
+
+## From JSON object
+
+Take a JSON containing a JSON object created by this library. Combine it with an instantiator and convert the JSON object back to the primordial used classes.
+
+```typescript
+var userJson = '{"@class":"User","id":1,"name":"Ronny"}'
+
+var userObj = JSON.parse(userJson)
+
+userObj == {
+  '@class': 'User',
+  id: 1,
+  name: 'Ronny'
+}
+
+var instantiator = {
+  'User': () => new User()
+}
+
+var user = fromJsonObj(userObj, instantiator)
+
+user == {
+  id: 1,
+  name: 'Ronny'
+}
+```
+
+## Fill an existing object
+
+Fill that object that you already have in place.
+
+```typescript
+var userJson = '{"@class":"User","id":2,"name":"Hagen"}'
+
+var userObj = JSON.parse(userJson)
+
+var user = new User
+
+fillWithJsonObj(user, userObj)
+
+user == {
+  id: 2,
+  name: 'Hagen'
+}
+```
+
+## Exclusion of properties starting with an underscore
+
+Normally you do not want to include the private properties of an object in the JSON which you want to send over the wire. This library will skip properties starting with an underscore `_` which signals a private property.
+
+```typescript
+class User {
+  id = 2
+  name = 'Hagen'
+  private _password = 'hagenforever'
+}
+
+var user = new User
+var userObj = toJsonObj(user)
+
+userObj == {
+  id: 2,
+  name: 'Hagen'
+}
+```
+
+If there is a property getter in place it will be used instead.
+
+```typescript
+class User {
+  id = 2
+  name = 'Hagen'
+  private _password = 'hagenforever'
+
+  get password() {
+    return 'secret'
+  }
+}
+
+var user = new User
+var userObj = toJsonObj(user)
+
+userObj == {
+  id: 2,
+  name: 'Hagen',
+  password: 'secret'
+}
+```
+
+## Blacklist or whitelist properties
+
+You can specify properties to exlude.
+
+```typescript
+class User {
+  id = 3
+  name = 'Elias'
+  password = 'eliasforpresident'
+}
+
+var user = new User
+
+var options = {
+  exclude: ['password']
+}
+
+var userObj = toJsonObj(user, options)
+
+userObj == {
+  id: 3,
+  name: 'Elias'
+}
+```
+
+Or you can specify properties to be included.
+
+```typescript
+class User {
+  id = 3
+  name = 'Elias'
+  password = 'eliasforpresident'
+}
+
+var user = new User
+
+var options = {
+  include: ['id', 'name']
+}
+
+var userObj = toJsonObj(user, options)
+
+userObj == {
+  id: 3,
+  name: 'Elias'
+}
+```
+
+## Customize toJsonObj
+
+If you need to do something custom when converting one of your objects defined a `toJsonObj` method. Additionally there is also support to name this method `toJson` or `toObj`.
+
+```typescript
+class User {
+  id = 3
+  name = 'Elias'
+  password = 'eliasforpresident'
+
+  toJsonObj() {
+    var options = {
+      exclude: ['password'],
+      doNotUseCustomToJsonMethodOfFirstObject: true
+    }
+
+    return toJsonObj(this, options)
+  }
+}
+
+var user = new User
+var userObj = toJsonObj(user)
+
+userObj == {
+  id: 3,
+  name: 'Elias'
+}
+```
+
+If you still want to use `toJsonObj` as the basis of you converstion process it is important to use the `doNotUseCustomToJsonMethodOfFirstObject` option which will ensure that you will not get stuck in the recursion. 
+
+## Customize fillWithJsonObj
+
+If you need to do something special when filling one of your objects with a JSON object define the `fillWithJsonObj` method. Additionally there is also support to name this method `fillWithJson` or `fillWithObj`.
+
+```typescript
+class User {
+  id = 3
+  name = 'Elias'
+  password = 'eliasforpresident'
+
+  fillWithJsonObj() {
+    var options = {
+      include: ['id', 'name'],
+      doNotUseCustomToJsonMethodOfFirstObject: true
+    }
+
+    fillWithJsonObj(this, options)
+  }
+}
+
+var userObj = {
+  id: 3,
+  name: 'Elias',
+  password: 'hackattack'
+}
+
+var user = new User
+fillWithJsonObj(user, userObj)
+
+user == {
+  id: 3,
+  name: 'Elias',
+  password: undefined
+}
+```
+
+## Combine instantiators
+
+You can combine instantiators by using the provided `Instantiator` class.
+
+```typescript
+import { Instantiator } from 'mega-nice-json'
+
+class UserInstantiator extends Instantiator {
+  'User' = () => new User()
+}
+
+class AppInstantiator extends Instantiator {
+  'SomeClass' = () => new SomeClass()
+
+  constructor(new UserInstantiator) {}
+}
+```
