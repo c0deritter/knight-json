@@ -158,7 +158,7 @@ describe('toJsonObj', function() {
   })
 
   it('should add an array of objects', function() {
-    let test = new TestClass1([ new TestClass1('a', 1), {} ])
+    let test = new TestClass1([ new TestClass1('a', [ new TestClass1('b', 2)]), {} ])
     let obj = toJsonObj(test)
 
     expect(obj).to.deep.equal({
@@ -167,7 +167,11 @@ describe('toJsonObj', function() {
         {
           '@class': 'TestClass1',
           a: 'a',
-          b: 1
+          b: [{
+            '@class': 'TestClass1',
+            a: 'b',
+            b: 2
+          }]
         },
         {}
       ]
