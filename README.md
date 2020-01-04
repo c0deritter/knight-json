@@ -122,7 +122,7 @@ class User {
 }
 
 var user = new User
-var userObj = toJsonObj(user, { exclude: ['password'] })
+var userObj = toJsonObj(user, { exclude: ['password'] }) // magic
 
 userObj == {
   '@class': 'User',
@@ -141,7 +141,7 @@ class User {
 }
 
 var user = new User
-var userObj = toJsonObj(user, { include: ['id', 'name'] })
+var userObj = toJsonObj(user, { include: ['id', 'name'] }) // magic
 
 userObj == {
   '@class': 'User',
@@ -160,6 +160,7 @@ class User {
   name = 'Elias'
   password = 'eliasforpresident'
 
+  // magic
   toJsonObj() {
     var options = {
       exclude: ['password'],
@@ -192,6 +193,7 @@ class User {
   name = 'Elias'
   password = 'eliasforpresident'
 
+  // magic
   fillWithJsonObj() {
     var options = {
       include: ['id', 'name'],
