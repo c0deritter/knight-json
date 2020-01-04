@@ -13,7 +13,7 @@ class User {
 }
 
 var user = new User
-var userObj = toJsonObj(user)
+var userObj = toJsonObj(user) // magic
 
 userObj == {
   '@class': 'User',
@@ -38,7 +38,7 @@ var instantiator = {
   'User': () => new User()
 }
 
-var user = fromJsonObj(userObj, instantiator)
+var user = fromJsonObj(userObj, instantiator) // magic
 
 user instanceof User == true
 
@@ -57,7 +57,7 @@ var userJson = '{"@class":"User","id":2,"name":"Hagen"}'
 var userObj = JSON.parse(userJson)
 var user = new User
 
-fillWithJsonObj(user, userObj)
+fillWithJsonObj(user, userObj) // magic
 
 user == {
   id: 2,
