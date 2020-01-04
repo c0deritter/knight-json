@@ -125,6 +125,7 @@ var user = new User
 var userObj = toJsonObj(user, { exclude: ['password'] })
 
 userObj == {
+  '@class': 'User',
   id: 3,
   name: 'Elias'
 }
@@ -143,6 +144,7 @@ var user = new User
 var userObj = toJsonObj(user, { include: ['id', 'name'] })
 
 userObj == {
+  '@class': 'User',
   id: 3,
   name: 'Elias'
 }
@@ -172,6 +174,7 @@ var user = new User
 var userObj = toJsonObj(user)
 
 userObj == {
+  '@class': 'User',
   id: 3,
   name: 'Elias'
 }
