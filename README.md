@@ -234,7 +234,9 @@ class UserInstantiator extends Instantiator {
 class AppInstantiator extends Instantiator {
   'SomeClass' = () => new SomeClass
 
-  constructor(new UserInstantiator) {}
+  constructor() {
+    super(new UserInstantiator)
+  }
 }
 
 var instantiator = new AppInstantiator
