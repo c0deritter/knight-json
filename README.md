@@ -2,7 +2,7 @@
 
 A mega nice programming language object to JSON object converter.
 
-## toJsonObj
+## toJsonObj()
 
 Convert one of your classes to a plain JavaScript object called a JSON object which is ready to be converted to a JSON string.
 
@@ -26,7 +26,7 @@ var userJson = JSON.stringify(userObj)
 userJson == '{"@class":"User","id":1,"name":"Ronny"}'
 ```
 
-## fromJsonObj
+## fromJsonObj()
 
 Take a JSON containing a JSON object created by this library. Combine it with an instantiator and convert the JSON object back to the primordial used classes.
 
@@ -48,7 +48,7 @@ user == {
 }
 ```
 
-## fillWithJsonObj
+## fillWithJsonObj()
 
 Fill that object that you already have in place.
 
