@@ -34,7 +34,8 @@ Take a JSON containing a JSON object created by this library. Combine it with an
 var userJson = '{"@class":"User","id":1,"name":"Ronny"}'
 var userObj = JSON.parse(userJson)
 
-var instantiator = { // magic
+// magic
+var instantiator = {
   'User': () => new User()
 }
 
@@ -160,7 +161,8 @@ class User {
   name = 'Elias'
   password = 'eliasforpresident'
 
-  toJsonObj() { // magic
+  // magic
+  toJsonObj() {
     var options = {
       exclude: ['password'],
       doNotUseCustomToJsonMethodOfFirstObject: true
@@ -171,7 +173,7 @@ class User {
 }
 
 var user = new User
-var userObj = toJsonObj(user)
+var userObj = toJsonObj(user) // magic
 
 userObj == {
   '@class': 'User',
@@ -192,7 +194,8 @@ class User {
   name = 'Elias'
   password = 'eliasforpresident'
 
-  fillWithJsonObj() { // magic
+  // magic
+  fillWithJsonObj() {
     var options = {
       include: ['id', 'name'],
       doNotUseCustomToJsonMethodOfFirstObject: true
@@ -209,7 +212,7 @@ var userObj = {
 }
 
 var user = new User
-fillWithJsonObj(user, userObj)
+fillWithJsonObj(user, userObj) // magic
 
 user == {
   id: 3,
@@ -233,7 +236,7 @@ class AppInstantiator extends Instantiator {
   'SomeClass' = () => new SomeClass
 
   constructor() {
-    super(new UserInstantiator)
+    super(new UserInstantiator) // magic
   }
 }
 
