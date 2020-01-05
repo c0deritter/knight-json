@@ -2,11 +2,17 @@
 
 A mega nice programming language object to JSON object converter.
 
+## Install
+
+`npm install mega-nice-json`
+
 ## toJsonObj()
 
 Convert one of your classes to a plain JavaScript object called a JSON object which is ready to be converted to a JSON string.
 
 ```typescript
+import { toJsonObj } from 'mega-nice-json'
+
 class User {
   id = 1
   name = 'Ronny'
@@ -31,6 +37,8 @@ userJson == '{"@class":"User","id":1,"name":"Ronny"}'
 Take a JSON containing a JSON object created by this library. Combine it with an instantiator and convert the JSON object back to the primordial used classes.
 
 ```typescript
+import { fromJsonObj } from 'mega-nice-json'
+
 let userJson = '{"@class":"User","id":1,"name":"Ronny"}'
 let userObj = JSON.parse(userJson)
 
@@ -54,6 +62,8 @@ user == {
 Fill that object that you already have in place.
 
 ```typescript
+import { fillWithJsonObj } from 'mega-nice-json'
+
 let userJson = '{"@class":"User","id":2,"name":"Hagen"}'
 let userObj = JSON.parse(userJson)
 let user = new User
