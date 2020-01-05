@@ -116,39 +116,13 @@ userObj == {
 You can specify properties to exclude.
 
 ```typescript
-class User {
-  id = 3
-  name = 'Elias'
-  password = 'eliasforpresident'
-}
-
-var user = new User
-var userObj = toJsonObj(user, { exclude: ['password'] }) // magic
-
-userObj == {
-  '@class': 'User',
-  id: 3,
-  name: 'Elias'
-}
+var userObj = toJsonObj(user, { exclude: ['password'] })
 ```
 
 Or you can specify properties to be included.
 
 ```typescript
-class User {
-  id = 3
-  name = 'Elias'
-  password = 'eliasforpresident'
-}
-
-var user = new User
-var userObj = toJsonObj(user, { include: ['id', 'name'] }) // magic
-
-userObj == {
-  '@class': 'User',
-  id: 3,
-  name: 'Elias'
-}
+var userObj = toJsonObj(user, { include: ['id', 'name'] })
 ```
 
 ## Customize toJsonObj
@@ -223,7 +197,7 @@ user == {
 
 ## Combine instantiators
 
-You can combine instantiators by using the provided `Instantiator` class.
+You can combine instantiators by using the provided `Instantiator` class. It has a constructor taking arbitrary many instantiators and merging them into itself.
 
 ```typescript
 import { Instantiator } from 'mega-nice-json'
