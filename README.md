@@ -12,8 +12,8 @@ class User {
   name = 'Ronny'
 }
 
-var user = new User
-var userObj = toJsonObj(user) // magic
+let user = new User
+let userObj = toJsonObj(user) // magic
 
 userObj == {
   '@class': 'User',
@@ -21,7 +21,7 @@ userObj == {
   name: 'Ronny'
 }
 
-var userJson = JSON.stringify(userObj)
+let userJson = JSON.stringify(userObj)
 
 userJson == '{"@class":"User","id":1,"name":"Ronny"}'
 ```
@@ -31,15 +31,15 @@ userJson == '{"@class":"User","id":1,"name":"Ronny"}'
 Take a JSON containing a JSON object created by this library. Combine it with an instantiator and convert the JSON object back to the primordial used classes.
 
 ```typescript
-var userJson = '{"@class":"User","id":1,"name":"Ronny"}'
-var userObj = JSON.parse(userJson)
+let userJson = '{"@class":"User","id":1,"name":"Ronny"}'
+let userObj = JSON.parse(userJson)
 
 // magic
-var instantiator = {
+let instantiator = {
   'User': () => new User()
 }
 
-var user = fromJsonObj(userObj, instantiator) // magic
+let user = fromJsonObj(userObj, instantiator) // magic
 
 user instanceof User == true
 
@@ -54,9 +54,9 @@ user == {
 Fill that object that you already have in place.
 
 ```typescript
-var userJson = '{"@class":"User","id":2,"name":"Hagen"}'
-var userObj = JSON.parse(userJson)
-var user = new User
+let userJson = '{"@class":"User","id":2,"name":"Hagen"}'
+let userObj = JSON.parse(userJson)
+let user = new User
 
 fillWithJsonObj(user, userObj) // magic
 
@@ -77,8 +77,8 @@ class User {
   private _password = 'hagenforever'
 }
 
-var user = new User
-var userObj = toJsonObj(user) // magic
+let user = new User
+let userObj = toJsonObj(user) // magic
 
 userObj == {
   '@class': 'User',
@@ -100,8 +100,8 @@ class User {
   }
 }
 
-var user = new User
-var userObj = toJsonObj(user) // magic
+let user = new User
+let userObj = toJsonObj(user) // magic
 
 userObj == {
   '@class': 'User',
@@ -116,13 +116,13 @@ userObj == {
 You can specify properties to exclude.
 
 ```typescript
-var userObj = toJsonObj(user, { exclude: ['password'] })
+let userObj = toJsonObj(user, { exclude: ['password'] })
 ```
 
 Or you can specify properties to be included.
 
 ```typescript
-var userObj = toJsonObj(user, { include: ['id', 'name'] })
+let userObj = toJsonObj(user, { include: ['id', 'name'] })
 ```
 
 ## Customize toJsonObj
@@ -136,18 +136,15 @@ class User {
   password = 'eliasforpresident'
 
   // magic
-  toJsonObj() {
-    var options = {
-      exclude: ['password'],
-      doNotUseCustomToJsonMethodOfFirstObject: true
-    }
-
+  toJsonObj(options: ToJsonOptions = {}) {
+    options.exclude = ['password'] // maybe merge here
+    options.doNotUseCustomToJsonMethodOfFirstObject = true
     return toJsonObj(this, options)
   }
 }
 
-var user = new User
-var userObj = toJsonObj(user) // magic
+let user = new User
+let userObj = toJsonObj(user) // magic
 
 userObj == {
   '@class': 'User',
@@ -169,30 +166,14 @@ class User {
   password = 'eliasforpresident'
 
   // magic
-  fillWithJsonObj() {
-    var options = {
-      include: ['id', 'name'],
-      doNotUseCustomToJsonMethodOfFirstObject: true
-    }
-
-    fillWithJsonObj(this, options)
+  fillWithJsonObj(obj: any, options: FillWithJsonObjOptions = {}) {
+    options.include = ['id', 'name'] // maybe merge here
+    options.doNotUseCustomToJsonMethodOfFirstObject = true
+    fillWithJsonObj(this, obj, options)
   }
 }
 
-var userObj = {
-  id: 3,
-  name: 'Elias',
-  password: 'hackattack'
-}
-
-var user = new User
 fillWithJsonObj(user, userObj) // magic
-
-user == {
-  id: 3,
-  name: 'Elias',
-  password: undefined
-}
 ```
 
 ## Combine instantiators
@@ -214,7 +195,7 @@ class AppInstantiator extends Instantiator {
   }
 }
 
-var instantiator = new AppInstantiator
+let instantiator = new AppInstantiator
 
 instantiator == {
   'SomeClass': () => new SomeClass
