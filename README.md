@@ -130,6 +130,8 @@ let userObj = toJsonObj(user, { include: ['id', 'name'] })
 If you need to do something custom when converting one of your objects define a `toJsonObj` method which will be used to convert your object. Additionally there is also support to name this method `toJson` or `toObj`.
 
 ```typescript
+import {ToJsonOptions } from 'mega-nice-json'
+
 class User {
   id = 3
   name = 'Elias'
@@ -160,6 +162,8 @@ If you still want to use `toJsonObj` as the basis of you converstion process it 
 If you need to do something special when filling one of your objects with a JSON object define the `fillWithJsonObj` method. Additionally there is also support to name this method `fillWithJson` or `fillWithObj`.
 
 ```typescript
+import { FillWithJsonObjOptions } from 'mega-nice-json'
+
 class User {
   id = 3
   name = 'Elias'
