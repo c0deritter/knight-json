@@ -205,7 +205,7 @@ export function fromJsonObj(jsonObj: any, instantiator?: Instantiator): any {
   if (typeof jsonObj === 'string') {
     try {
       let parsed = JSON.parse(jsonObj)
-      fromJsonObj(parsed, instantiator)
+      return fromJsonObj(parsed, instantiator)
     }
     catch (e) {
       return jsonObj

@@ -122,6 +122,12 @@ describe('fromJsonObj', function() {
     let obj = fromJsonObj(null)
     expect(obj).to.be.null
   })
+
+  it('should be able to convert a JSON string', function() {
+    let json = JSON.stringify({ testProp: 'testProp' })
+    let obj = fromJsonObj(json)
+    expect(obj.testProp).to.equal('testProp')
+  })
 })
 
 class TestClass1 {}
