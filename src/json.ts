@@ -2,8 +2,8 @@ export interface ToJsonOptions {
   include?: string[]
   exclude?: string[]
   converter?: { [propertyName: string]: (propertyValue: any) => any }
-  keepEmptyArrays?: boolean
-  keepEmptyObjects?: boolean
+  omitEmptyArrays?: boolean
+  omitEmptyObjects?: boolean
   omitClassProperty?: boolean
   doNotUseCustomToJsonMethodOfFirstObject?: boolean
 }
@@ -86,15 +86,14 @@ export function toJsonObj(obj: any, options?: ToJsonOptions): any {
       continue
     }
 
-    // skip empty arrays if we do not keep empty arrays
-    if ((! options || options && ! options.keepEmptyArrays) 
-        && propValue instanceof Array && propValue.length == 0) {
+    // skip empty arrays if the corresponding option is set
+    if (options && options.omitEmptyArrays && propValue instanceof Array && propValue.length == 0) {
       continue
     }
 
-    // skip empty objects if we do not keep empty objects
-    if ((! options || options && ! options.keepEmptyObjects) 
-        && typeof propValue === 'object' && propValue !== null && Object.keys(propValue).length == 0) {
+    // skip empty objects if the corresponding option is set
+    if (options && options.omitEmptyObjects && typeof propValue === 'object' && 
+        propValue !== null && Object.keys(propValue).length == 0) {
       continue
     }
 

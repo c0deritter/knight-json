@@ -110,22 +110,22 @@ describe('toJsonObj', function() {
     })
   })
 
-  it('should omit a property of type object if it is empty', function() {
+  it('should keep a property of type object if it is empty', function() {
     let test = new TestClass1({})
     let obj = toJsonObj(test)
 
     expect(obj).to.deep.equal({
-      '@class': 'TestClass1'
+      '@class': 'TestClass1',
+      a: {}
     })
   })
 
-  it('should not omit a property of type object which is empty if the corresponding option is set', function() {
+  it('should omit a property of type object which is empty if the corresponding option is set', function() {
     let test = new TestClass1({})
-    let obj = toJsonObj(test, { keepEmptyObjects: true })
+    let obj = toJsonObj(test, { omitEmptyObjects: true })
 
     expect(obj).to.deep.equal({
-      '@class': 'TestClass1',
-      a: {}
+      '@class': 'TestClass1'
     })
   })
 
@@ -139,18 +139,19 @@ describe('toJsonObj', function() {
     })
   })
 
-  it('should omit an empty array property', function() {
+  it('should keep an empty array property', function() {
     let test = new TestClass1([])
     let obj = toJsonObj(test)
 
     expect(obj).to.deep.equal({
-      '@class': 'TestClass1'
+      '@class': 'TestClass1',
+      a: []
     })
   })
 
-  it('should not omit an empty array property if the corresponding option is set', function() {
+  it('should omit an empty array property if the corresponding option is set', function() {
     let test = new TestClass1([])
-    let obj = toJsonObj(test, { keepEmptyArrays: true })
+    let obj = toJsonObj(test, { omitEmptyArrays: true })
 
     expect(obj).to.deep.equal({
       '@class': 'TestClass1'
