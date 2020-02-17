@@ -27,15 +27,15 @@ export function toJsonObj(obj: any, options?: ToJsonOptions): any {
   }
 
   if ((! options || options && ! options.doNotUseCustomToJsonMethodOfFirstObject) && obj !== null) {
-    if (typeof obj.toObj === 'function') {
+    if (typeof obj.toObj == 'function') {
       return obj.toObj(options)
     }
 
-    if (typeof obj.toJson === 'function') {
+    if (typeof obj.toJson == 'function') {
       return obj.toJson(options)
     }
 
-    if (typeof obj.toJsonObj === 'function') {
+    if (typeof obj.toJsonObj == 'function') {
       return obj.toJsonObj(options)
     }
   }
@@ -101,7 +101,7 @@ export function toJsonObj(obj: any, options?: ToJsonOptions): any {
       }
 
       // skip empty objects if the corresponding option is set
-      if (options && options.omitEmptyObjects && typeof propValue === 'object' && 
+      if (options && options.omitEmptyObjects && typeof propValue == 'object' && 
           propValue !== null && Object.keys(propValue).length == 0) {
         continue
       }
@@ -129,21 +129,31 @@ export function toJsonObj(obj: any, options?: ToJsonOptions): any {
   return jsonObj
 }
 
-export interface FillWithJsonObjOptions {
+export interface FillWithJsonObjOptions extends FromJsonObjOptions {
   include?: string[]
   exclude?: string[]
-  instantiator?: Instantiator
   doNotUseCustomToJsonMethodOfFirstObject?: boolean
 }
 
-export function fillWithJsonObj(obj: any, fillWith: any, options?: FillWithJsonObjOptions) {
-  if (typeof obj !== 'object' || obj === null) {
+export function fillWithJsonObj(obj: any, jsonObj: any, options?: FillWithJsonObjOptions): void
+export function fillWithJsonObj(obj: any, jsonObj: any, instantiator?: Instantiator): void
+
+export function fillWithJsonObj(obj: any, jsonObj: any, optionsOrInstantiator?: FillWithJsonObjOptions|Instantiator): void {
+  let options
+  if (optionsOrInstantiator instanceof Instantiator) {
+    options = { instantiator: optionsOrInstantiator }
+  }
+  else {
+    options = optionsOrInstantiator
+  }
+
+  if (typeof obj != 'object' || obj === null) {
     return 
   }
 
-  if (typeof fillWith === 'string') {
+  if (typeof jsonObj == 'string') {
     try {
-      let parsed = JSON.parse(fillWith)
+      let parsed = JSON.parse(jsonObj)
       fillWithJsonObj(obj, parsed)
     }
     catch (e) {
@@ -153,31 +163,34 @@ export function fillWithJsonObj(obj: any, fillWith: any, options?: FillWithJsonO
   }
 
   // if the given value to fill with is not an object just do nothing
-  if (typeof fillWith !== 'object') {
+  if (typeof jsonObj !== 'object') {
     return 
   }
 
   if (! options || options && ! options.doNotUseCustomToJsonMethodOfFirstObject) {
-    if (typeof obj.fillWithObj === 'function') {
-      obj.fillWithObj(fillWith, options)
+    if (typeof obj.fillWithObj == 'function') {
+      obj.fillWithObj(jsonObj, options)
       return
     }
-    else if (typeof obj.fillWithJson === 'function') {
-      obj.fillWithJson(fillWith, options)
+    else if (typeof obj.fillWithJson == 'function') {
+      obj.fillWithJson(jsonObj, options)
       return
     }
-    else if (typeof obj.fillWithJsonObj === 'function') {
-      obj.fillWithJsonObj(fillWith, options)
+    else if (typeof obj.fillWithJsonObj == 'function') {
+      obj.fillWithJsonObj(jsonObj, options)
       return
     }
   }
 
   if (options) {
-    delete options.doNotUseCustomToJsonMethodOfFirstObject
+    options = {
+      instantiator: options.instantiator,
+      converter: options.converter
+    }
   }
 
-  for (let prop in fillWith) {
-    if (! Object.prototype.hasOwnProperty.call(fillWith, prop)) {
+  for (let prop in jsonObj) {
+    if (! Object.prototype.hasOwnProperty.call(jsonObj, prop)) {
       continue
     }
 
@@ -187,15 +200,15 @@ export function fillWithJsonObj(obj: any, fillWith: any, options?: FillWithJsonO
 
     let propName = prop.toString()
     let originalValue = obj[propName]
-    let fillWithValue = fillWith[propName]
+    let fillWithValue = jsonObj[propName]
 
-    if (typeof originalValue === 'object' && originalValue !== null 
-        && typeof fillWithValue === 'object' && fillWithValue !== null) {
+    if (typeof originalValue == 'object' && originalValue !== null 
+        && typeof fillWithValue == 'object' && fillWithValue !== null) {
       fillWithJsonObj(originalValue, fillWithValue, options)
     }
     else {
-      if (typeof fillWithValue === 'object') {
-        obj[propName] = fromJsonObj(fillWithValue, options ? options.instantiator : undefined)
+      if (typeof fillWithValue == 'object') {
+        obj[propName] = fromJsonObj(fillWithValue, options)
       }
       else {
         obj[propName] = fillWithValue
@@ -204,18 +217,34 @@ export function fillWithJsonObj(obj: any, fillWith: any, options?: FillWithJsonO
   }
 }
 
-export function fromJsonObj(jsonObj: any, instantiator?: Instantiator): any {
-  if (typeof jsonObj === 'string') {
+export interface FromJsonObjOptions {
+  instantiator?: Instantiator
+  converter?: { [className: string]: (obj: any, options?: FromJsonObjOptions) => any }
+}
+
+export function fromJsonObj(jsonObj: any, options?: FromJsonObjOptions): any
+export function fromJsonObj(jsonObj: any, instantiator?: Instantiator): any
+
+export function fromJsonObj(jsonObj: any, optionsOrInstantiator?: FromJsonObjOptions|Instantiator): any {
+  let options
+  if (optionsOrInstantiator instanceof Instantiator) {
+    options = { instantiator: optionsOrInstantiator }
+  }
+  else {
+    options = optionsOrInstantiator
+  }
+
+  if (typeof jsonObj == 'string') {
     try {
       let parsed = JSON.parse(jsonObj)
-      return fromJsonObj(parsed, instantiator)
+      return fromJsonObj(parsed, optionsOrInstantiator)
     }
     catch (e) {
       return jsonObj
     }
   }
 
-  if (typeof jsonObj !== 'object' || jsonObj === null) {
+  if (typeof jsonObj != 'object' || jsonObj === null) {
     return jsonObj
   }
 
@@ -223,7 +252,7 @@ export function fromJsonObj(jsonObj: any, instantiator?: Instantiator): any {
     let values = []
       
     for (let value of jsonObj) {
-      values.push(fromJsonObj(value, instantiator))
+      values.push(fromJsonObj(value, optionsOrInstantiator))
     }
 
     return values
@@ -231,11 +260,13 @@ export function fromJsonObj(jsonObj: any, instantiator?: Instantiator): any {
 
   let obj
 
-  if ('@class' in jsonObj && typeof jsonObj['@class'] === 'string' && instantiator != undefined) {
-    let cls: string = jsonObj['@class']
-
-    if (cls in instantiator) {
-      let instantiatorFunction = instantiator[cls]
+  if ('@class' in jsonObj && typeof jsonObj['@class'] == 'string') {
+    if (options && options.converter && jsonObj['@class'] in options.converter) {
+      let converterFunction = options.converter[jsonObj['@class']]
+      return converterFunction(jsonObj, options)
+    }
+    else if (options?.instantiator != undefined && jsonObj['@class'] in options.instantiator) {
+      let instantiatorFunction = options.instantiator[jsonObj['@class']]
       obj = instantiatorFunction()
     }
     else {
@@ -246,17 +277,17 @@ export function fromJsonObj(jsonObj: any, instantiator?: Instantiator): any {
     obj = {}
   }
 
-  if (typeof obj.fillWithObj === 'function') {
-    obj.fillWithObj(jsonObj, { instantiator: instantiator })
+  if (typeof obj.fillWithObj == 'function') {
+    obj.fillWithObj(jsonObj, options)
   }
-  else if (typeof obj.fillWithJson === 'function') {
-    obj.fillWithJson(jsonObj, { instantiator: instantiator })
+  else if (typeof obj.fillWithJson == 'function') {
+    obj.fillWithJson(jsonObj, options)
   }
-  else if (typeof obj.fillWithJsonObj === 'function') {
-    obj.fillWithJsonObj(jsonObj, { instantiator: instantiator })
+  else if (typeof obj.fillWithJsonObj == 'function') {
+    obj.fillWithJsonObj(jsonObj, options)
   }
   else {
-    fillWithJsonObj(obj, jsonObj, { instantiator: instantiator })
+    fillWithJsonObj(obj, jsonObj, options)
   }
 
   return obj
@@ -264,7 +295,7 @@ export function fromJsonObj(jsonObj: any, instantiator?: Instantiator): any {
 
 export class Instantiator {
   
-  [propertyName: string]: () => any
+  [className: string]: () => any
 
   constructor(...instantiators: Instantiator[]) {
     for (let instantiator of instantiators) {

@@ -1,6 +1,6 @@
 import { expect } from 'chai'
 import 'mocha'
-import { fromJsonObj, Instantiator } from '../src/json'
+import { fromJsonObj, Instantiator, fillWithJsonObj, FromJsonObjOptions } from '../src/json'
 
 describe('fromJsonObj', function() {
   it('should create an empty object', function() {
@@ -85,6 +85,40 @@ describe('fromJsonObj', function() {
     expect(convertedObj.c).to.equal(1)
   })
 
+  it('should create the corresponding class', function() {
+    let jsonObj = {
+      '@class': 'TestClass1',
+      a: {
+        '@class': 'TestClass6',
+        a: '1'
+      },
+      b: [
+        { '@class': 'TestClass6', a: '2' }
+      ]
+    }
+
+    let obj = fromJsonObj(jsonObj, { converter: {
+      'TestClass1': (jsonObj: any, options?: FromJsonObjOptions) => {
+        let obj = new TestClass1
+        fillWithJsonObj(obj, jsonObj, options)
+        return obj
+      },
+      'TestClass6': (jsonObj: any) => {
+        let obj = new TestClass6
+        obj.a = 'a' + jsonObj.a
+        return obj
+      }
+    }})
+
+    expect(obj).to.be.instanceOf(TestClass1)
+    expect(obj.a).to.be.instanceOf(TestClass6)
+    expect(obj.a.a).to.equal('a1')
+    expect(obj.b).to.be.instanceOf(Array)
+    expect(obj.b.length).to.equal(1)
+    expect(obj.b[0]).to.be.instanceOf(TestClass6)
+    expect(obj.b[0].a).to.equal('a2')
+  })
+
   it('should use fillWithObj method if available', function() {
     let jsonObj = { 
       '@class': 'TestClass3',
@@ -152,6 +186,10 @@ class TestClass5 {
   fillWithJsonObj(jsonObj: any) { 
     this.a = jsonObj.a + 'a'
   }
+}
+
+class TestClass6 {
+  a!: string
 }
 
 class TestInstantiator extends Instantiator {
