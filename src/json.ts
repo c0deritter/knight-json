@@ -1,7 +1,7 @@
 export interface ToJsonOptions {
   include?: string[]
   exclude?: string[]
-  converter?: { [propertyName: string]: (propertyValue: any) => any }
+  converter?: { [className: string]: (obj: any, jsonObj: any) => void }
   omitPrivateProperties?: boolean
   omitPrivatePropertiesAndUseGetMethodsInstead?: boolean
   omitEmptyArrays?: boolean
@@ -51,78 +51,78 @@ export function toJsonObj(obj: any, options?: ToJsonOptions): any {
     jsonObj['@class'] = obj.constructor.name
   }
 
-  // copy any field that is not private and not the parent
-  for (let prop in obj) {
-    if (! Object.prototype.hasOwnProperty.call(obj, prop)) {
-      continue
-    }
+  if (options && options.converter && obj.constructor.name in options.converter) {
+    let converter = options.converter[obj.constructor.name]
+    converter(obj, jsonObj)
+  }
+  else {
+    // copy all fields
+    for (let prop in obj) {
+      if (! Object.prototype.hasOwnProperty.call(obj, prop)) {
+        continue
+      }
 
-    let propName = prop.toString()
-    let propValue: any
+      let propName = prop.toString()
+      let propValue: any
 
-    // if the property is a private or protected one it should start with _
-    if (prop.indexOf('_') == 0 && options && (options.omitPrivateProperties || options.omitPrivatePropertiesAndUseGetMethodsInstead)) {
-      if (options.omitPrivatePropertiesAndUseGetMethodsInstead) {
-        // get property name which should be the same but without the _
-        propName = prop.substr(1)
+      // if the property is a private or protected one it should start with _
+      if (prop.indexOf('_') == 0 && options && (options.omitPrivateProperties || options.omitPrivatePropertiesAndUseGetMethodsInstead)) {
+        if (options.omitPrivatePropertiesAndUseGetMethodsInstead) {
+          // get property name which should be the same but without the _
+          propName = prop.substr(1)
 
-        // if there is a property on the object use it to retrieve the value
-        if (propName in obj) {
-          propValue = (<any> obj)[propName]
+          // if there is a property on the object use it to retrieve the value
+          if (propName in obj) {
+            propValue = (<any> obj)[propName]
+          }
         }
       }
-    }
-    // if it is not private just retrieve the value
-    else {
-      propValue = (<any> obj)[propName]
-    }
+      // if it is not private just retrieve the value
+      else {
+        propValue = (<any> obj)[propName]
+      }
 
-    if (options && options.include && options.include.indexOf(propName) == -1) {
-      continue
-    }
+      if (options && options.include && options.include.indexOf(propName) == -1) {
+        continue
+      }
 
-    if (options && options.exclude && options.exclude.indexOf(propName) != -1) {
-      continue
-    }
+      if (options && options.exclude && options.exclude.indexOf(propName) != -1) {
+        continue
+      }
 
-    // if the value is undefined skip it
-    if (propValue === undefined) {
-      continue
-    }
+      // if the value is undefined skip it
+      if (propValue === undefined) {
+        continue
+      }
 
-    // skip empty arrays if the corresponding option is set
-    if (options && options.omitEmptyArrays && propValue instanceof Array && propValue.length == 0) {
-      continue
-    }
+      // skip empty arrays if the corresponding option is set
+      if (options && options.omitEmptyArrays && propValue instanceof Array && propValue.length == 0) {
+        continue
+      }
 
-    // skip empty objects if the corresponding option is set
-    if (options && options.omitEmptyObjects && typeof propValue === 'object' && 
-        propValue !== null && Object.keys(propValue).length == 0) {
-      continue
-    }
+      // skip empty objects if the corresponding option is set
+      if (options && options.omitEmptyObjects && typeof propValue === 'object' && 
+          propValue !== null && Object.keys(propValue).length == 0) {
+        continue
+      }
 
-    // start conversion
+      // start conversion
 
-    // if there is a custom converter for the property
-    if (options && options.converter && propName in options.converter) {
-      let converter = options.converter[propName]
-      jsonObj[propName] = converter(propValue)
-    }
+      // else if it is an array we need to iterate every single array item
+      if (propValue instanceof Array) {
+        let jsonArray = toJsonObj(propValue, options)
+        jsonObj[propName] = jsonArray
+      }
 
-    // else if it is an array we need to iterate every single array item
-    else if (propValue instanceof Array) {
-      let jsonArray = toJsonObj(propValue, options)
-      jsonObj[propName] = jsonArray
-    }
+      // if the value is an object it may have the 'toObj' method
+      else if (typeof propValue == 'object' && propValue !== null) {
+        jsonObj[propName] = toJsonObj(propValue, options)
+      }
 
-    // if the value is an object it may have the 'toObj' method
-    else if (typeof propValue == 'object' && propValue !== null) {
-      jsonObj[propName] = toJsonObj(propValue, options)
-    }
-
-    // otherwise just set it
-    else {
-      jsonObj[propName] = propValue
+      // otherwise just set it
+      else {
+        jsonObj[propName] = propValue
+      }
     }
   }
 

@@ -220,7 +220,7 @@ describe('toJsonObj', function() {
 
   it('should use the given converter', function() {
     let test = new TestClass1('a')
-    let obj = toJsonObj(test, { converter: { 'a': v => v + 'a' }})
+    let obj = toJsonObj(test, { converter: { 'TestClass1': (obj, jsonObj) => { jsonObj.a = obj.a + 'a' }}})
 
     expect(obj).to.deep.equal({
       '@class': 'TestClass1',
