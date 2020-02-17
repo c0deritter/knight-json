@@ -2,6 +2,8 @@ export interface ToJsonOptions {
   include?: string[]
   exclude?: string[]
   converter?: { [propertyName: string]: (propertyValue: any) => any }
+  omitPrivateProperties?: boolean
+  omitPrivatePropertiesAndUseGetMethodsInstead?: boolean
   omitEmptyArrays?: boolean
   omitEmptyObjects?: boolean
   omitClassProperty?: boolean
@@ -59,13 +61,15 @@ export function toJsonObj(obj: any, options?: ToJsonOptions): any {
     let propValue: any
 
     // if the property is a private or protected one it should start with _
-    if (prop.indexOf('_') == 0) {
-      // get property name which should be the same but without the _
-      propName = prop.substr(1)
+    if (prop.indexOf('_') == 0 && options && (options.omitPrivateProperties || options.omitPrivatePropertiesAndUseGetMethodsInstead)) {
+      if (options.omitPrivatePropertiesAndUseGetMethodsInstead) {
+        // get property name which should be the same but without the _
+        propName = prop.substr(1)
 
-      // if there is a property on the object use it to retrieve the value
-      if (propName in obj) {
-        propValue = (<any> obj)[propName]
+        // if there is a property on the object use it to retrieve the value
+        if (propName in obj) {
+          propValue = (<any> obj)[propName]
+        }
       }
     }
     // if it is not private just retrieve the value

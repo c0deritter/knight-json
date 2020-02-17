@@ -77,18 +77,37 @@ describe('toJsonObj', function() {
     })
   })
 
-  it('should not add a property starting with an underscore', function() {
+  it('should add a property starting with an underscore', function() {
     let test = new TestClass3()
     let obj = toJsonObj(test)
+
+    expect(obj).to.deep.equal({
+      '@class': 'TestClass3',
+      '_a': 'a'
+    })
+  })
+
+  it('should omit a property starting with an underscore if the corresponding option is set', function() {
+    let test = new TestClass3()
+    let obj = toJsonObj(test, { omitPrivateProperties: true })
 
     expect(obj).to.deep.equal({
       '@class': 'TestClass3'
     })
   })
 
-  it('should use the getter if the property is starting with an underscore', function() {
+  it('should not use the getter if the property is starting with an underscore', function() {
     let test = new TestClass4()
-    let obj = toJsonObj(test)
+    let obj = toJsonObj(test, { omitPrivateProperties: true })
+
+    expect(obj).to.deep.equal({
+      '@class': 'TestClass4'
+    })
+  })
+
+  it('should not use the getter if the property is starting with an underscore if the corresponding option is set', function() {
+    let test = new TestClass4()
+    let obj = toJsonObj(test, { omitPrivatePropertiesAndUseGetMethodsInstead: true })
 
     expect(obj).to.deep.equal({
       '@class': 'TestClass4',
