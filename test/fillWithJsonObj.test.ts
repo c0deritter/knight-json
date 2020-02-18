@@ -180,6 +180,14 @@ describe('fillWithJsonObj', function() {
     expect(test.a).to.equal('a')
     expect(test.b.a).to.equal('aa')
   })
+
+  it('should convert a property of type Date', function() {
+    let date = new Date
+    let obj: any = { }
+    fillWithJsonObj(obj, { a: { '@class': 'Date', date: date.toISOString() }})
+    expect(obj.a).to.be.instanceOf(Date)
+    expect(obj.a.toISOString()).to.equal(date.toISOString())
+  })
 })
 
 class TestClass1 {

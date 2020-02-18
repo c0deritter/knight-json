@@ -26,6 +26,15 @@ export function toJsonObj(obj: any, options?: ToJsonOptions): any {
     return jsonArray
   }
 
+  options = options || {}
+  options.converter = options.converter || {}
+
+  if (! ('Date' in options.converter)) {
+    options.converter['Date'] = (obj: Date, jsonObj: any) => {
+      jsonObj.date = obj.toISOString()
+    }
+  }
+
   if ((! options || options && ! options.doNotUseCustomToJsonMethodOfFirstObject) && obj !== null) {
     if (typeof obj.toObj == 'function') {
       return obj.toObj(options)
@@ -146,14 +155,6 @@ export function fillWithJsonObj(obj: any, jsonObj: any, options?: FillWithJsonOb
 export function fillWithJsonObj(obj: any, jsonObj: any, instantiator?: Instantiator): void
 
 export function fillWithJsonObj(obj: any, jsonObj: any, optionsOrInstantiator?: FillWithJsonObjOptions|Instantiator): void {
-  let options
-  if (optionsOrInstantiator instanceof Instantiator) {
-    options = { instantiator: optionsOrInstantiator }
-  }
-  else {
-    options = optionsOrInstantiator
-  }
-
   if (typeof obj != 'object' || obj === null) {
     return 
   }
@@ -172,6 +173,14 @@ export function fillWithJsonObj(obj: any, jsonObj: any, optionsOrInstantiator?: 
   // if the given value to fill with is not an object just do nothing
   if (typeof jsonObj !== 'object') {
     return 
+  }
+
+  let options
+  if (optionsOrInstantiator instanceof Instantiator) {
+    options = { instantiator: optionsOrInstantiator }
+  }
+  else {
+    options = optionsOrInstantiator
   }
 
   if (! options || options && ! options.doNotUseCustomToJsonMethodOfFirstObject) {
@@ -226,21 +235,13 @@ export function fillWithJsonObj(obj: any, jsonObj: any, optionsOrInstantiator?: 
 
 export interface FromJsonObjOptions {
   instantiator?: Instantiator
-  converter?: { [className: string]: (obj: any, options?: FromJsonObjOptions) => any }
+  converter?: { [className: string]: (jsonObj: any, options?: FromJsonObjOptions) => any }
 }
 
 export function fromJsonObj(jsonObj: any, options?: FromJsonObjOptions): any
 export function fromJsonObj(jsonObj: any, instantiator?: Instantiator): any
 
 export function fromJsonObj(jsonObj: any, optionsOrInstantiator?: FromJsonObjOptions|Instantiator): any {
-  let options
-  if (optionsOrInstantiator instanceof Instantiator) {
-    options = { instantiator: optionsOrInstantiator }
-  }
-  else {
-    options = optionsOrInstantiator
-  }
-
   if (typeof jsonObj == 'string') {
     try {
       let parsed = JSON.parse(jsonObj)
@@ -266,6 +267,21 @@ export function fromJsonObj(jsonObj: any, optionsOrInstantiator?: FromJsonObjOpt
   }
 
   let obj
+  let options
+
+  if (optionsOrInstantiator instanceof Instantiator) {
+    options = { instantiator: optionsOrInstantiator }
+  }
+  else {
+    options = optionsOrInstantiator
+  }
+
+  options = options || {}
+  options.converter = options.converter || {}
+  
+  if (! ('Date' in options.converter)) {
+    options.converter['Date'] = (jsonObj: any) => new Date(jsonObj.date)
+  }
 
   if ('@class' in jsonObj && typeof jsonObj['@class'] == 'string') {
     if (options && options.converter && jsonObj['@class'] in options.converter) {

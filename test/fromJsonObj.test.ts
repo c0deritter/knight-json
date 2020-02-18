@@ -162,6 +162,19 @@ describe('fromJsonObj', function() {
     let obj = fromJsonObj(json)
     expect(obj.testProp).to.equal('testProp')
   })
+
+  it('should convert a Date', function() {
+    let date = new Date
+    let jsonObj = {
+      '@class': 'Date',
+      date: date.toISOString()
+    }
+
+    let obj = fromJsonObj(jsonObj)
+
+    expect(obj).to.be.instanceOf(Date)
+    expect(obj.toISOString()).to.equal(date.toISOString())
+  })
 })
 
 class TestClass1 {}

@@ -282,6 +282,15 @@ describe('toJsonObj', function() {
     expect(obj.a).to.equal('a')
     expect(obj.b.c).to.equal(11)
   })
+
+  it('should convert a Date', function() {
+    let date = new Date
+    
+    let obj = toJsonObj(date)
+
+    expect(obj['@class']).to.equal('Date')
+    expect(obj.date).to.equal(date.toISOString())
+  })
 })
 
 class TestClass1 {
