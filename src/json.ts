@@ -41,7 +41,14 @@ export function toJsonObj(obj: any, options?: ToJsonOptions): any {
   }
 
   if (options) {
-    delete options.doNotUseCustomToJsonMethodOfFirstObject
+    options = {
+      converter: options.converter,
+      omitPrivateProperties: options.omitPrivateProperties,
+      omitPrivatePropertiesAndUseGetMethodsInstead: options.omitPrivatePropertiesAndUseGetMethodsInstead,
+      omitEmptyArrays: options.omitEmptyArrays,
+      omitEmptyObjects: options.omitEmptyObjects,
+      omitClassProperty: options.omitClassProperty
+    }
   }
 
   let jsonObj: any = {}
