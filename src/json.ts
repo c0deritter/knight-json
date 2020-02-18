@@ -49,8 +49,9 @@ export function toJsonObj(obj: any, options?: ToJsonOptions): any {
     }
   }
 
+  let recursionOptions = undefined
   if (options) {
-    options = {
+    recursionOptions = {
       converter: options.converter,
       omitPrivateProperties: options.omitPrivateProperties,
       omitPrivatePropertiesAndUseGetMethodsInstead: options.omitPrivatePropertiesAndUseGetMethodsInstead,
@@ -126,13 +127,13 @@ export function toJsonObj(obj: any, options?: ToJsonOptions): any {
 
       // else if it is an array we need to iterate every single array item
       if (propValue instanceof Array) {
-        let jsonArray = toJsonObj(propValue, options)
+        let jsonArray = toJsonObj(propValue, recursionOptions)
         jsonObj[propName] = jsonArray
       }
 
       // if the value is an object it may have the 'toObj' method
       else if (typeof propValue == 'object' && propValue !== null) {
-        jsonObj[propName] = toJsonObj(propValue, options)
+        jsonObj[propName] = toJsonObj(propValue, recursionOptions)
       }
 
       // otherwise just set it
@@ -198,8 +199,9 @@ export function fillWithJsonObj(obj: any, jsonObj: any, optionsOrInstantiator?: 
     }
   }
 
+  let recursionOptions = undefined
   if (options) {
-    options = {
+    recursionOptions = {
       instantiator: options.instantiator,
       converter: options.converter
     }
@@ -220,11 +222,11 @@ export function fillWithJsonObj(obj: any, jsonObj: any, optionsOrInstantiator?: 
 
     if (typeof originalValue == 'object' && originalValue !== null 
         && typeof fillWithValue == 'object' && fillWithValue !== null) {
-      fillWithJsonObj(originalValue, fillWithValue, options)
+      fillWithJsonObj(originalValue, fillWithValue, recursionOptions)
     }
     else {
       if (typeof fillWithValue == 'object') {
-        obj[propName] = fromJsonObj(fillWithValue, options)
+        obj[propName] = fromJsonObj(fillWithValue, recursionOptions)
       }
       else {
         obj[propName] = fillWithValue
