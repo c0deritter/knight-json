@@ -136,6 +136,13 @@ export function toJsonObj(obj: any, options?: ToJsonOptions): any {
         jsonObj[propName] = toJsonObj(propValue, recursionOptions)
       }
 
+      else if (typeof propValue == 'bigint') {
+        jsonObj[propName] = {
+          '@class': 'BigInt',
+          value: propValue.toString()
+        }
+      }
+
       // otherwise just set it
       else {
         jsonObj[propName] = propValue
@@ -281,6 +288,33 @@ export function fromJsonObj(jsonObj: any, optionsOrInstantiator?: FromJsonObjOpt
   options = options || {}
   options.converter = options.converter || {}
   
+  if (! ('BigInt' in options.converter)) {
+    options.converter['BigInt'] = (jsonObj: any) => {
+      if (typeof jsonObj.value == 'number') {
+        return BigInt(jsonObj.value)
+      }
+
+      if (typeof jsonObj.value == 'string') {
+        try {
+          return BigInt(jsonObj.value)
+        }
+        catch (e) {
+          return jsonObj.value
+        }
+      }
+
+      if (jsonObj.value === true) {
+        return BigInt(1)
+      }
+
+      if (jsonObj.value === false) {
+        return BigInt(0)
+      }
+      
+      return jsonObj.value
+    }
+  }
+
   if (! ('Date' in options.converter)) {
     options.converter['Date'] = (jsonObj: any) => new Date(jsonObj.date)
   }

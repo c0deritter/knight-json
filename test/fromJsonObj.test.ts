@@ -175,6 +175,88 @@ describe('fromJsonObj', function() {
     expect(obj).to.be.instanceOf(Date)
     expect(obj.toISOString()).to.equal(date.toISOString())
   })
+
+  it('should convert a BigInt', function() {
+    let jsonObj = {
+      '@class': 'BigInt',
+      value: BigInt(3).toString()
+    }
+
+    let obj = fromJsonObj(jsonObj)
+
+    expect(obj).to.be.a('bigint')
+    expect(obj).to.equal(BigInt(3))
+  })
+
+  it('should convert a BigInt with undefined value', function() {
+    let jsonObj = {
+      '@class': 'BigInt',
+      value: undefined
+    }
+
+    let obj = fromJsonObj(jsonObj)
+    expect(obj).to.be.undefined
+  })
+
+  it('should convert a BigInt with null value', function() {
+    let jsonObj = {
+      '@class': 'BigInt',
+      value: null
+    }
+
+    let obj = fromJsonObj(jsonObj)
+    expect(obj).to.be.null
+  })
+
+  it('should convert a BigInt with true value', function() {
+    let jsonObj = {
+      '@class': 'BigInt',
+      value: true
+    }
+
+    let obj = fromJsonObj(jsonObj)
+    expect(obj).to.equal(BigInt(1))
+  })
+
+  it('should convert a BigInt with false value', function() {
+    let jsonObj = {
+      '@class': 'BigInt',
+      value: false
+    }
+
+    let obj = fromJsonObj(jsonObj)
+    expect(obj).to.equal(BigInt(0))
+  })
+
+  it('should convert a BigInt with an object value', function() {
+    let jsonObj = {
+      '@class': 'BigInt',
+      value: { b: 1 }
+    }
+
+    let obj = fromJsonObj(jsonObj)
+    expect(obj).to.deep.equal({ b: 1 })
+  })
+
+  it('should convert a BigInt with an array value', function() {
+    let jsonObj = {
+      '@class': 'BigInt',
+      value: ['a', 1]
+    }
+
+    let obj = fromJsonObj(jsonObj)
+    expect(obj).to.deep.equal(['a', 1])
+  })
+
+  it('should convert a BigInt with wrongly formatted string value', function() {
+    let jsonObj = {
+      '@class': 'BigInt',
+      value: 'a'
+    }
+
+    let obj = fromJsonObj(jsonObj)
+    expect(obj).to.equal('a')
+  })
 })
 
 class TestClass1 {}
