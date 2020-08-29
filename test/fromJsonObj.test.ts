@@ -1,6 +1,6 @@
 import { expect } from 'chai'
 import 'mocha'
-import { fromJsonObj, Instantiator, fillWithJsonObj, FromJsonObjOptions } from '../src/json'
+import { fillWithJsonObj, fromJsonObj, FromJsonObjOptions } from '../src/json'
 
 describe('fromJsonObj', function() {
   it('should create an empty object', function() {
@@ -22,7 +22,7 @@ describe('fromJsonObj', function() {
       ]
     }
 
-    let obj = fromJsonObj(jsonObj, new TestInstantiator())
+    let obj = fromJsonObj(jsonObj, { instantiator: instantiator })
 
     expect(obj).to.be.instanceOf(TestClass1)
     expect(obj.a).to.be.instanceOf(TestClass2)
@@ -42,7 +42,7 @@ describe('fromJsonObj', function() {
       ]
     }
 
-    let obj = fromJsonObj(jsonObj, new TestInstantiator())
+    let obj = fromJsonObj(jsonObj, { instantiator: instantiator })
 
     expect(obj).to.be.instanceOf(Object)
     expect(obj.b).to.be.instanceOf(Array)
@@ -58,7 +58,7 @@ describe('fromJsonObj', function() {
       { '@class': 'TestClass2' }
     ]
 
-    let convertedArray = fromJsonObj(array, new TestInstantiator())
+    let convertedArray = fromJsonObj(array, { instantiator: instantiator })
 
     expect(convertedArray.length).to.equal(4)
     expect(convertedArray[0]).to.be.instanceOf(TestClass1)
@@ -72,7 +72,7 @@ describe('fromJsonObj', function() {
       c: 1
     }
 
-    let convertedObj = fromJsonObj(obj, new TestInstantiator())
+    let convertedObj = fromJsonObj(obj, { instantiator: instantiator })
     
     expect(convertedObj).to.not.be.undefined
     expect(convertedObj.a).to.equal('a')
@@ -125,7 +125,7 @@ describe('fromJsonObj', function() {
       a: 'a'
     }
 
-    let obj = fromJsonObj(jsonObj, new TestInstantiator())
+    let obj = fromJsonObj(jsonObj, { instantiator: instantiator })
 
     expect(obj.a).to.equal('aa')
   })
@@ -136,7 +136,7 @@ describe('fromJsonObj', function() {
       a: 'a'
     }
 
-    let obj = fromJsonObj(jsonObj, new TestInstantiator())
+    let obj = fromJsonObj(jsonObj, { instantiator: instantiator })
 
     expect(obj.a).to.equal('aa')
   })
@@ -147,7 +147,7 @@ describe('fromJsonObj', function() {
       a: 'a'
     }
 
-    let obj = fromJsonObj(jsonObj, new TestInstantiator())
+    let obj = fromJsonObj(jsonObj, { instantiator: instantiator })
 
     expect(obj.a).to.equal('aa')
   })
@@ -287,10 +287,10 @@ class TestClass6 {
   a!: string
 }
 
-class TestInstantiator extends Instantiator {
-  'TestClass1' = () => new TestClass1()
-  'TestClass2' = () => new TestClass2()
-  'TestClass3' = () => new TestClass3()
-  'TestClass4' = () => new TestClass4()
-  'TestClass5' = () => new TestClass5()
+let instantiator = {
+  'TestClass1': () => new TestClass1(),
+  'TestClass2': () => new TestClass2(),
+  'TestClass3': () => new TestClass3(),
+  'TestClass4': () => new TestClass4(),
+  'TestClass5': () => new TestClass5()
 }

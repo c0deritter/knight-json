@@ -159,10 +159,7 @@ export interface FillWithJsonObjOptions extends FromJsonObjOptions {
   doNotUseCustomToJsonMethodOfFirstObject?: boolean
 }
 
-export function fillWithJsonObj(obj: any, jsonObj: any, options?: FillWithJsonObjOptions): void
-export function fillWithJsonObj(obj: any, jsonObj: any, instantiator?: Instantiator): void
-
-export function fillWithJsonObj(obj: any, jsonObj: any, optionsOrInstantiator?: FillWithJsonObjOptions|Instantiator): void {
+export function fillWithJsonObj(obj: any, jsonObj: any, options?: FillWithJsonObjOptions): void {
   if (typeof obj != 'object' || obj === null) {
     return 
   }
@@ -181,14 +178,6 @@ export function fillWithJsonObj(obj: any, jsonObj: any, optionsOrInstantiator?: 
   // if the given value to fill with is not an object just do nothing
   if (typeof jsonObj !== 'object') {
     return 
-  }
-
-  let options
-  if (optionsOrInstantiator instanceof Instantiator) {
-    options = { instantiator: optionsOrInstantiator }
-  }
-  else {
-    options = optionsOrInstantiator
   }
 
   if (! options || options && ! options.doNotUseCustomToJsonMethodOfFirstObject) {
@@ -243,18 +232,15 @@ export function fillWithJsonObj(obj: any, jsonObj: any, optionsOrInstantiator?: 
 }
 
 export interface FromJsonObjOptions {
-  instantiator?: Instantiator
+  instantiator?: { [className: string]: () => any }
   converter?: { [className: string]: (jsonObj: any, options?: FromJsonObjOptions) => any }
 }
 
-export function fromJsonObj(jsonObj: any, options?: FromJsonObjOptions): any
-export function fromJsonObj(jsonObj: any, instantiator?: Instantiator): any
-
-export function fromJsonObj(jsonObj: any, optionsOrInstantiator?: FromJsonObjOptions|Instantiator): any {
+export function fromJsonObj(jsonObj: any, options?: FromJsonObjOptions): any {
   if (typeof jsonObj == 'string') {
     try {
       let parsed = JSON.parse(jsonObj)
-      return fromJsonObj(parsed, optionsOrInstantiator)
+      return fromJsonObj(parsed, options)
     }
     catch (e) {
       return jsonObj
@@ -269,21 +255,13 @@ export function fromJsonObj(jsonObj: any, optionsOrInstantiator?: FromJsonObjOpt
     let values = []
       
     for (let value of jsonObj) {
-      values.push(fromJsonObj(value, optionsOrInstantiator))
+      values.push(fromJsonObj(value, options))
     }
 
     return values
   }
 
   let obj
-  let options
-
-  if (optionsOrInstantiator instanceof Instantiator) {
-    options = { instantiator: optionsOrInstantiator }
-  }
-  else {
-    options = optionsOrInstantiator
-  }
 
   options = options || {}
   options.converter = options.converter || {}
@@ -350,19 +328,4 @@ export function fromJsonObj(jsonObj: any, optionsOrInstantiator?: FromJsonObjOpt
   }
 
   return obj
-}
-
-export class Instantiator {
-  
-  [className: string]: () => any
-
-  constructor(...instantiators: Instantiator[]) {
-    for (let instantiator of instantiators) {
-      for (let prop in instantiator) {
-        if (Object.prototype.hasOwnProperty.call(instantiator, prop)) {
-          this[prop] = instantiator[prop]
-        }
-      }
-    }
-  }
 }
