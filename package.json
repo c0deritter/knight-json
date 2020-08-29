@@ -9,13 +9,13 @@
   ],
   "dependencies": {},
   "devDependencies": {
-    "@types/chai": "^4.2.7",
+    "@types/chai": "^4.2.12",
     "@types/mocha": "^5.2.7",
-    "@types/node": "^12.12.17",
+    "@types/node": "^12.12.54",
     "chai": "^4.2.0",
-    "mocha": "^6.2.2",
-    "ts-node": "^8.4.1",
-    "typescript": "^3.7.2"
+    "mocha": "^6.2.3",
+    "ts-node": "^8.10.2",
+    "typescript": "^3.9.7"
   },
   "scripts": {
     "test": "mocha -r ts-node/register test/**/*.test.ts",
