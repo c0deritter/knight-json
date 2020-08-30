@@ -31,6 +31,7 @@ export function toJsonObj(obj: any, options?: ToJsonOptions): any {
 
   if (! ('Date' in options.converter)) {
     options.converter['Date'] = (obj: Date, jsonObj: any) => {
+      jsonObj['@class'] = 'Date'
       jsonObj.date = obj.toISOString()
     }
   }

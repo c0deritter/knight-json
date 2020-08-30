@@ -292,6 +292,15 @@ describe('toJsonObj', function() {
     expect(obj.date).to.equal(date.toISOString())
   })
 
+  it('should convert a Date while not omitting @class', function() {
+    let date = new Date
+    
+    let obj = toJsonObj(date, { omitClassProperty: true })
+
+    expect(obj['@class']).to.equal('Date')
+    expect(obj.date).to.equal(date.toISOString())
+  })
+
   it('should convert a BigInt in a compatible way', function() {
     let test = {
       a: BigInt(3)
