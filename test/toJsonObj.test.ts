@@ -228,32 +228,6 @@ describe('toJsonObj', function() {
     })
   })  
 
-  it('should use toObj method if available', function() {
-    let test = {
-      a: 'a',
-      toObj: () => { return { a: 'aa' } }
-    }
-
-    let obj = toJsonObj(test)
-    
-    expect(obj).to.deep.equal({
-      a: 'aa'
-    })
-  })
-
-  it('should use toJson method if available', function() {
-    let test = {
-      a: 'a',
-      toJson: () => { return { a: 'aa' } }
-    }
-
-    let obj = toJsonObj(test)
-    
-    expect(obj).to.deep.equal({
-      a: 'aa'
-    })
-  })
-
   it('should use toJsonObj method if available', function() {
     let test = {
       a: 'a',
@@ -272,9 +246,9 @@ describe('toJsonObj', function() {
       a: 'a',
       b: {
         c: 1,
-        toObj: () => { return { c: 11 } }
+        toJsonObj: () => { return { c: 11 } }
       },
-      toObj: () => { return { a: 'aa' } }
+      toJsonObj: () => { return { a: 'aa' } }
     }
 
     let obj = toJsonObj(test, { doNotUseCustomToJsonMethodOfFirstObject: true })

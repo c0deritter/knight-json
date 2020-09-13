@@ -37,14 +37,6 @@ export function toJsonObj(obj: any, options?: ToJsonOptions): any {
   }
 
   if ((! options || options && ! options.doNotUseCustomToJsonMethodOfFirstObject) && obj !== null) {
-    if (typeof obj.toObj == 'function') {
-      return obj.toObj(options)
-    }
-
-    if (typeof obj.toJson == 'function') {
-      return obj.toJson(options)
-    }
-
     if (typeof obj.toJsonObj == 'function') {
       return obj.toJsonObj(options)
     }
@@ -154,13 +146,13 @@ export function toJsonObj(obj: any, options?: ToJsonOptions): any {
   return jsonObj
 }
 
-export interface FillWithJsonObjOptions extends FromJsonObjOptions {
+export interface FillJsonObjOptions extends FromJsonObjOptions {
   include?: string[]
   exclude?: string[]
   doNotUseCustomToJsonMethodOfFirstObject?: boolean
 }
 
-export function fillWithJsonObj(obj: any, jsonObj: any, options?: FillWithJsonObjOptions): void {
+export function fillJsonObj(obj: any, jsonObj: any, options?: FillJsonObjOptions): void {
   if (typeof obj != 'object' || obj === null) {
     return 
   }
@@ -168,7 +160,7 @@ export function fillWithJsonObj(obj: any, jsonObj: any, options?: FillWithJsonOb
   if (typeof jsonObj == 'string') {
     try {
       let parsed = JSON.parse(jsonObj)
-      fillWithJsonObj(obj, parsed)
+      fillJsonObj(obj, parsed)
     }
     catch (e) {
       // if it is not a JSON string we can do nothing
@@ -182,16 +174,8 @@ export function fillWithJsonObj(obj: any, jsonObj: any, options?: FillWithJsonOb
   }
 
   if (! options || options && ! options.doNotUseCustomToJsonMethodOfFirstObject) {
-    if (typeof obj.fillWithObj == 'function') {
-      obj.fillWithObj(jsonObj, options)
-      return
-    }
-    else if (typeof obj.fillWithJson == 'function') {
-      obj.fillWithJson(jsonObj, options)
-      return
-    }
-    else if (typeof obj.fillWithJsonObj == 'function') {
-      obj.fillWithJsonObj(jsonObj, options)
+    if (typeof obj.fillJsonObj == 'function') {
+      obj.fillJsonObj(jsonObj, options)
       return
     }
   }
@@ -215,18 +199,18 @@ export function fillWithJsonObj(obj: any, jsonObj: any, options?: FillWithJsonOb
 
     let propName = prop.toString()
     let originalValue = obj[propName]
-    let fillWithValue = jsonObj[propName]
+    let fillValue = jsonObj[propName]
 
     if (typeof originalValue == 'object' && originalValue !== null 
-        && typeof fillWithValue == 'object' && fillWithValue !== null) {
-      fillWithJsonObj(originalValue, fillWithValue, recursionOptions)
+        && typeof fillValue == 'object' && fillValue !== null) {
+      fillJsonObj(originalValue, fillValue, recursionOptions)
     }
     else {
-      if (typeof fillWithValue == 'object') {
-        obj[propName] = fromJsonObj(fillWithValue, recursionOptions)
+      if (typeof fillValue == 'object') {
+        obj[propName] = fromJsonObj(fillValue, recursionOptions)
       }
       else {
-        obj[propName] = fillWithValue
+        obj[propName] = fillValue
       }  
     }
   }
@@ -315,18 +299,20 @@ export function fromJsonObj(jsonObj: any, options?: FromJsonObjOptions): any {
     obj = {}
   }
 
-  if (typeof obj.fillWithObj == 'function') {
-    obj.fillWithObj(jsonObj, options)
-  }
-  else if (typeof obj.fillWithJson == 'function') {
-    obj.fillWithJson(jsonObj, options)
-  }
-  else if (typeof obj.fillWithJsonObj == 'function') {
-    obj.fillWithJsonObj(jsonObj, options)
+  if (typeof obj.fillJsonObj == 'function') {
+    obj.fillJsonObj(jsonObj, options)
   }
   else {
-    fillWithJsonObj(obj, jsonObj, options)
+    fillJsonObj(obj, jsonObj, options)
   }
 
   return obj
+}
+
+export function toJson(obj: any, options?: ToJsonOptions): string {
+  return JSON.stringify(toJsonObj(obj, options))
+}
+
+export function fromJson(jsonObj: any, options?: FromJsonObjOptions): any {
+  return fromJsonObj(JSON.parse(jsonObj), options)
 }

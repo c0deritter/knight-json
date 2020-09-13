@@ -1,1 +1,0 @@
-docker run -it --rm --volume $(pwd):/hostdir --workdir /hostdir node:latest bash

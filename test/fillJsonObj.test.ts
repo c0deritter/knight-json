@@ -1,13 +1,13 @@
-import 'mocha'
 import { expect } from 'chai'
-import { fillWithJsonObj } from '../src/json'
+import 'mocha'
+import { fillJsonObj } from '../src/json'
 
-describe('fillWithJsonObj', function() {
+describe('fillJsonObj', function() {
   it('should add simple properties', function() {
     let test = { }
     let obj = { a: 'a', b: 1 }
 
-    fillWithJsonObj(test, obj)
+    fillJsonObj(test, obj)
 
     expect(test).to.deep.equal({
       a: 'a',
@@ -19,7 +19,7 @@ describe('fillWithJsonObj', function() {
     let test = { }
     let obj = JSON.stringify({ a: 'a', b: 1 })
 
-    fillWithJsonObj(test, obj)
+    fillJsonObj(test, obj)
 
     expect(test).to.deep.equal({
       a: 'a',
@@ -31,7 +31,7 @@ describe('fillWithJsonObj', function() {
     let test = { }
     let obj = ''
 
-    fillWithJsonObj(test, obj)
+    fillJsonObj(test, obj)
 
     expect(test).to.deep.equal({})
   })
@@ -40,7 +40,7 @@ describe('fillWithJsonObj', function() {
     let test = { }
     let obj = { a: { a: 'a', b: 1 } }
 
-    fillWithJsonObj(test, obj)
+    fillJsonObj(test, obj)
 
     expect(test).to.deep.equal({
       a:
@@ -55,7 +55,7 @@ describe('fillWithJsonObj', function() {
     let test = { }
     let obj = { a: [[ 'a', 1 ], [ { a: 'a', b: 1 }, {}]] }
 
-    fillWithJsonObj(test, obj)
+    fillJsonObj(test, obj)
 
     expect(test).to.deep.equal({
       a: [
@@ -68,45 +68,27 @@ describe('fillWithJsonObj', function() {
     })
   })
 
-  it('should use fillWithObj method if available', function() {
-    let test = new TestClass1()
-    let jsonObj = { a: 'a' }
-
-    fillWithJsonObj(test, jsonObj)
-
-    expect(test.a).to.equal('aa')
-  })
-
-  it('should use fillWithJson method if available', function() {
-    let test = new TestClass2()
-    let jsonObj = { a: 'a' }
-
-    fillWithJsonObj(test, jsonObj)
-
-    expect(test.a).to.equal('aa')
-  })
-
-  it('should use fillWithJsonObj method if available', function() {
+  it('should use fillJsonObj method if available', function() {
     let test = new TestClass3()
     let jsonObj = { a: 'a' }
 
-    fillWithJsonObj(test, jsonObj)
+    fillJsonObj(test, jsonObj)
 
     expect(test.a).to.equal('aa')
   })
 
   it('should return if obj is undefined', function() {
-    fillWithJsonObj(undefined, {})
+    fillJsonObj(undefined, {})
   })
 
   it('should return if obj is null', function() {
-    fillWithJsonObj(null, {})
+    fillJsonObj(null, {})
   })
 
   it('should return if obj is not object', function() {
-    fillWithJsonObj('', {})
-    fillWithJsonObj(1, {})
-    fillWithJsonObj(true, {})
+    fillJsonObj('', {})
+    fillJsonObj(1, {})
+    fillJsonObj(true, {})
   })
 
   it('should fill a property of type object', function() {
@@ -124,7 +106,7 @@ describe('fillWithJsonObj', function() {
       }
     }
 
-    fillWithJsonObj(test, fillWith)
+    fillJsonObj(test, fillWith)
 
     expect(test).to.deep.equal({
       a: {
@@ -147,7 +129,7 @@ describe('fillWithJsonObj', function() {
       a: null
     }
 
-    fillWithJsonObj(test, fillWith)
+    fillJsonObj(test, fillWith)
 
     expect(test).to.deep.equal({
       a: null
@@ -166,7 +148,7 @@ describe('fillWithJsonObj', function() {
       a: 'a'
     }
 
-    fillWithJsonObj(test, fillWith)
+    fillJsonObj(test, fillWith)
 
     expect(test).to.deep.equal({
       a: 'a'
@@ -176,7 +158,7 @@ describe('fillWithJsonObj', function() {
   it('should not use the custom fill method on the object if the corresponding option is set', function() {
     let test = new TestClass1()
     test.b = new TestClass1()
-    fillWithJsonObj(test, { a: 'a', b: { a: 'a' } }, { doNotUseCustomToJsonMethodOfFirstObject: true })
+    fillJsonObj(test, { a: 'a', b: { a: 'a' } }, { doNotUseCustomToJsonMethodOfFirstObject: true })
     expect(test.a).to.equal('a')
     expect(test.b.a).to.equal('aa')
   })
@@ -184,7 +166,7 @@ describe('fillWithJsonObj', function() {
   it('should convert a property of type Date', function() {
     let date = new Date
     let obj: any = { }
-    fillWithJsonObj(obj, { a: { '@class': 'Date', date: date.toISOString() }})
+    fillJsonObj(obj, { a: { '@class': 'Date', date: date.toISOString() }})
     expect(obj.a).to.be.instanceOf(Date)
     expect(obj.a.toISOString()).to.equal(date.toISOString())
   })
@@ -193,21 +175,14 @@ describe('fillWithJsonObj', function() {
 class TestClass1 {
   a!: string
   b!: any
-  fillWithObj(jsonObj: any) {
-    this.a = jsonObj.a + 'a'
-  }
-}
-
-class TestClass2 {
-  a!: string
-  fillWithJson(jsonObj: any) { 
+  fillJsonObj(jsonObj: any) {
     this.a = jsonObj.a + 'a'
   }
 }
 
 class TestClass3 {
   a!: string
-  fillWithJsonObj(jsonObj: any) { 
+  fillJsonObj(jsonObj: any) { 
     this.a = jsonObj.a + 'a'
   }
 }

@@ -1,6 +1,6 @@
 import { expect } from 'chai'
 import 'mocha'
-import { fillWithJsonObj, fromJsonObj, FromJsonObjOptions } from '../src/json'
+import { fillJsonObj, fromJsonObj, FromJsonObjOptions } from '../src/json'
 
 describe('fromJsonObj', function() {
   it('should create an empty object', function() {
@@ -100,50 +100,28 @@ describe('fromJsonObj', function() {
     let obj = fromJsonObj(jsonObj, { converter: {
       'TestClass1': (jsonObj: any, options?: FromJsonObjOptions) => {
         let obj = new TestClass1
-        fillWithJsonObj(obj, jsonObj, options)
+        fillJsonObj(obj, jsonObj, options)
         return obj
       },
       'TestClass6': (jsonObj: any) => {
-        let obj = new TestClass6
+        let obj = new TestClass4
         obj.a = 'a' + jsonObj.a
         return obj
       }
     }})
 
     expect(obj).to.be.instanceOf(TestClass1)
-    expect(obj.a).to.be.instanceOf(TestClass6)
+    expect(obj.a).to.be.instanceOf(TestClass4)
     expect(obj.a.a).to.equal('a1')
     expect(obj.b).to.be.instanceOf(Array)
     expect(obj.b.length).to.equal(1)
-    expect(obj.b[0]).to.be.instanceOf(TestClass6)
+    expect(obj.b[0]).to.be.instanceOf(TestClass4)
     expect(obj.b[0].a).to.equal('a2')
   })
 
-  it('should use fillWithObj method if available', function() {
+  it('should use fillJsonObj method if available', function() {
     let jsonObj = { 
       '@class': 'TestClass3',
-      a: 'a'
-    }
-
-    let obj = fromJsonObj(jsonObj, { instantiator: instantiator })
-
-    expect(obj.a).to.equal('aa')
-  })
-
-  it('should use fillWithJson method if available', function() {
-    let jsonObj = { 
-      '@class': 'TestClass4',
-      a: 'a'
-    }
-
-    let obj = fromJsonObj(jsonObj, { instantiator: instantiator })
-
-    expect(obj.a).to.equal('aa')
-  })
-
-  it('should use fillWithJsonObj method if available', function() {
-    let jsonObj = { 
-      '@class': 'TestClass5',
       a: 'a'
     }
 
@@ -264,26 +242,11 @@ class TestClass2 {}
 
 class TestClass3 {
   a!: string
-  fillWithObj(jsonObj: any) {
+  fillJsonObj(jsonObj: any) {
     this.a = jsonObj.a + 'a'
   }
 }
-
 class TestClass4 {
-  a!: string
-  fillWithJson(jsonObj: any) { 
-    this.a = jsonObj.a + 'a'
-  }
-}
-
-class TestClass5 {
-  a!: string
-  fillWithJsonObj(jsonObj: any) { 
-    this.a = jsonObj.a + 'a'
-  }
-}
-
-class TestClass6 {
   a!: string
 }
 
@@ -291,6 +254,5 @@ let instantiator = {
   'TestClass1': () => new TestClass1(),
   'TestClass2': () => new TestClass2(),
   'TestClass3': () => new TestClass3(),
-  'TestClass4': () => new TestClass4(),
-  'TestClass5': () => new TestClass5()
+  'TestClass4': () => new TestClass4()
 }
