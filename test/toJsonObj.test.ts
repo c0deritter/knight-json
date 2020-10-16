@@ -129,6 +129,16 @@ describe('toJsonObj', function() {
     })
   })
 
+  it('should handle cyclic object structures', function() {
+    let test = new TestClass1
+    test.a = test
+    let obj = toJsonObj(test)
+
+    expect(obj).to.deep.equal({
+      '@class': 'TestClass1'
+    })
+  })
+
   it('should keep a property of type object if it is empty', function() {
     let test = new TestClass1({})
     let obj = toJsonObj(test)
@@ -216,6 +226,17 @@ describe('toJsonObj', function() {
         ]
       ]
     })
+  })
+
+  it('should convert an array containing the same object more than once', function() {
+    let test = new TestClass1
+    let testArray = [ test, test ]
+    let obj = toJsonObj(testArray)
+
+    expect(obj).to.deep.equal([
+      { '@class': 'TestClass1'},
+      { '@class': 'TestClass1'}
+    ])
   })
 
   it('should use the given converter', function() {

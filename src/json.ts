@@ -10,8 +10,8 @@ export interface ToJsonOptions {
   doNotUseCustomToJsonMethodOfFirstObject?: boolean
 }
 
-export function toJsonObj(obj: any, options?: ToJsonOptions): any {
-  if (typeof obj !== 'object') {
+export function toJsonObj(obj: any, options?: ToJsonOptions, alreadyConverted: any[] = []): any {
+  if (typeof obj !== 'object' || obj === null) {
     return obj
   }
 
@@ -19,7 +19,7 @@ export function toJsonObj(obj: any, options?: ToJsonOptions): any {
     let jsonArray = []
 
     for (let element of obj) {
-      let jsonObj = toJsonObj(element, options)
+      let jsonObj = toJsonObj(element, options, alreadyConverted)
       jsonArray.push(jsonObj)
     }
 
@@ -66,6 +66,8 @@ export function toJsonObj(obj: any, options?: ToJsonOptions): any {
     converter(obj, jsonObj)
   }
   else {
+    alreadyConverted.push(obj)
+
     // copy all fields
     for (let prop in obj) {
       if (! Object.prototype.hasOwnProperty.call(obj, prop)) {
@@ -120,13 +122,16 @@ export function toJsonObj(obj: any, options?: ToJsonOptions): any {
 
       // else if it is an array we need to iterate every single array item
       if (propValue instanceof Array) {
-        let jsonArray = toJsonObj(propValue, recursionOptions)
+        let jsonArray = toJsonObj(propValue, recursionOptions, alreadyConverted)
         jsonObj[propName] = jsonArray
       }
 
-      // if the value is an object it may have the 'toObj' method
+      // if the value is an object it may have the 'toJsonObj' method
       else if (typeof propValue == 'object' && propValue !== null) {
-        jsonObj[propName] = toJsonObj(propValue, recursionOptions)
+        if (alreadyConverted.indexOf(propValue) == -1) {
+          alreadyConverted.push(propValue)
+          jsonObj[propName] = toJsonObj(propValue, recursionOptions, alreadyConverted)
+        }
       }
 
       else if (typeof propValue == 'bigint') {
