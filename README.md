@@ -1,10 +1,10 @@
-# Mega Nice JSON
+# Knight JSON by Coderitter
 
-A mega nice programming language object to JSON object converter.
+A programming language object to JSON object converter.
 
 ## Install
 
-`npm install mega-nice-json`
+`npm install knight-json`
 
 ## Overview
 
@@ -13,7 +13,7 @@ A mega nice programming language object to JSON object converter.
 Convert one of your classes to a plain JavaScript object called a JSON object which is ready to be converted to a JSON string.
 
 ```typescript
-import { toJsonObj } from 'mega-nice-json'
+import { toJsonObj } from 'knight-json'
 
 class User {
   id = 1
@@ -39,7 +39,7 @@ userJson == '{"@class":"User","id":1,"name":"Ronny"}'
 Take a JSON containing a JSON object created by this library. Combine it with an instantiator and convert the JSON object back to the primordial used classes.
 
 ```typescript
-import { fromJsonObj } from 'mega-nice-json'
+import { fromJsonObj } from 'knight-json'
 
 let userJson = '{"@class":"User","id":1,"name":"Ronny"}'
 let userObj = JSON.parse(userJson)
@@ -64,7 +64,7 @@ user == {
 Fill that object that you already have in place.
 
 ```typescript
-import { fillWithJsonObj } from 'mega-nice-json'
+import { fillWithJsonObj } from 'knight-json'
 
 let userJson = '{"@class":"User","id":2,"name":"Hagen"}'
 let userObj = JSON.parse(userJson)
@@ -142,7 +142,7 @@ let userObj = toJsonObj(user, { include: ['id', 'name'] })
 If you need to do something custom when converting one of your objects define a `toJsonObj` method which will be used to convert your object. Additionally there is also support to name this method `toJson` or `toObj`.
 
 ```typescript
-import {ToJsonOptions } from 'mega-nice-json'
+import {ToJsonOptions } from 'knight-json'
 
 class User {
   id = 3
@@ -174,7 +174,7 @@ If you still want to use `toJsonObj` as the basis of you converstion process it 
 If you need to do something special when filling one of your objects with a JSON object define the `fillWithJsonObj` method. Additionally there is also support to name this method `fillWithJson` or `fillWithObj`.
 
 ```typescript
-import { FillWithJsonObjOptions } from 'mega-nice-json'
+import { FillWithJsonObjOptions } from 'knight-json'
 
 class User {
   id = 3
@@ -197,7 +197,7 @@ fillWithJsonObj(user, userObj) // magic
 You can combine instantiators by using the provided `Instantiator` class. It has a constructor taking arbitrary many instantiators and merging them into itself.
 
 ```typescript
-import { Instantiator } from 'mega-nice-json'
+import { Instantiator } from 'knight-json'
 
 class UserInstantiator extends Instantiator {
   'User' = () => new User
