@@ -1,6 +1,6 @@
 {
   "name": "knight-json",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "A programming language object to JSON object converter",
   "main": "lib/json.js",
   "types": "lib/json.d.ts",

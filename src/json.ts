@@ -31,7 +31,6 @@ export function toJsonObj(obj: any, options?: ToJsonOptions, alreadyConverted: a
 
   if (! ('Date' in options.converter)) {
     options.converter['Date'] = (obj: Date, jsonObj: any) => {
-      jsonObj['@class'] = 'Date'
       jsonObj.date = obj.toISOString()
     }
   }
@@ -174,7 +173,7 @@ export function fillJsonObj(obj: any, jsonObj: any, options?: FillJsonObjOptions
   }
 
   // if the given value to fill with is not an object just do nothing
-  if (typeof jsonObj !== 'object') {
+  if (typeof jsonObj != 'object') {
     return 
   }
 
@@ -318,6 +317,10 @@ export function toJson(obj: any, options?: ToJsonOptions): string {
   return JSON.stringify(toJsonObj(obj, options))
 }
 
-export function fromJson(jsonObj: any, options?: FromJsonObjOptions): any {
-  return fromJsonObj(JSON.parse(jsonObj), options)
+export function fromJson(json: any, options?: FromJsonObjOptions): any {
+  return fromJsonObj(JSON.parse(json), options)
+}
+
+export function fillJson(obj: any, json: any, options?: FillJsonObjOptions): void {
+  fillJsonObj(obj, JSON.parse(json), options)
 }
